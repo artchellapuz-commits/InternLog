@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="InternLog" />
+  <meta name="theme-color" content="#e05c2a" />
+  <title>InternLog – OJT Hours Tracker</title>
+  <link rel="apple-touch-icon" id="appleIcon" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── TOKENS ── */
+    :root {
+      --bg:#f0ede8; --surface:#fff; --surface-2:#f7f4ef; --border:#e2ddd6;
+      --text:#1a1714; --text-muted:#7a736b;
+      --accent:#e05c2a; --accent-light:#fce9e1; --accent-dark:#b8421a;
+      --green:#2e9e6b; --green-light:#d4f0e4;
+      --blue:#2563eb; --blue-light:#dbeafe;
+      --warn:#d97706; --warn-light:#fef3c7;
+      --danger:#c0392b; --danger-light:#fde8e6;
+      --shadow:0 2px 16px rgba(0,0,0,.08); --shadow-lg:0 8px 32px rgba(0,0,0,.12);
+      --radius:14px; --radius-sm:8px;
+      --font-display:'Syne',sans-serif; --font-body:'DM Sans',sans-serif;
+      --tr:all .25s cubic-bezier(.4,0,.2,1);
+      --sat:env(safe-area-inset-top); --sab:env(safe-area-inset-bottom);
+    }
+    [data-theme="dark"] {
+      --bg:#16130f; --surface:#211d18; --surface-2:#2a251f; --border:#3a332a;
+      --text:#f0ece6; --text-muted:#8a7f73;
+      --accent-light:#3d2017; --green-light:#0e3325;
+      --blue-light:#1e3a5f; --warn-light:#2d1f07; --danger-light:#2e0f0c;
+      --shadow:0 2px 16px rgba(0,0,0,.4); --shadow-lg:0 8px 32px rgba(0,0,0,.5);
+    }
+
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{height:100%}
+    body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100%;font-size:15px;line-height:1.6;transition:background .3s,color .3s;padding-top:var(--sat);padding-bottom:var(--sab)}
+
+    /* ── INSTALL BANNER ── */
+    #installBanner{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--accent);color:#fff;padding:14px 20px calc(14px + var(--sab));z-index:900;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 -4px 20px rgba(0,0,0,.2)}
+    #installBanner.show{display:flex}
+    #installBanner p{font-size:14px;font-weight:600;flex:1}
+    #installBanner p span{display:block;font-size:12px;font-weight:400;opacity:.85;margin-top:2px}
+    .banner-btn{background:#fff;color:var(--accent);border:none;border-radius:8px;padding:8px 16px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
+    .banner-dismiss{background:transparent;color:rgba(255,255,255,.8);border:none;cursor:pointer;font-size:20px;line-height:1;padding:4px}
+
+    /* ── LAYOUT ── */
+    .app-wrapper{max-width:720px;margin:0 auto;padding:24px 16px 100px}
+
+    /* ── HEADER ── */
+    .header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:12px}
+    .header-left h1{font-family:var(--font-display);font-size:clamp(1.6rem,5vw,2.2rem);font-weight:800;line-height:1.1;letter-spacing:-.5px}
+    .header-left h1 .accent{color:var(--accent)}
+    .header-left p{color:var(--text-muted);font-size:13px;margin-top:4px}
+    .header-actions{display:flex;gap:8px;align-items:center;flex-shrink:0;margin-top:4px}
+
+    /* ── PROFILE HERO CARD ── */
+    .profile-hero{
+      background:linear-gradient(135deg,var(--accent) 0%,#f5824a 100%);
+      border-radius:var(--radius);
+      padding:20px;
+      margin-bottom:16px;
+      color:#fff;
+      position:relative;
+      overflow:hidden;
+    }
+    .profile-hero::before{
+      content:'';position:absolute;top:-30px;right:-30px;
+      width:130px;height:130px;border-radius:50%;
+      background:rgba(255,255,255,.08);
+      pointer-events:none;
+    }
+    .profile-hero::after{
+      content:'';position:absolute;bottom:-20px;right:40px;
+      width:80px;height:80px;border-radius:50%;
+      background:rgba(255,255,255,.06);
+      pointer-events:none;
+    }
+    .profile-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+    .profile-avatar{
+      width:52px;height:52px;border-radius:50%;
+      background:rgba(255,255,255,.25);
+      display:flex;align-items:center;justify-content:center;
+      font-size:22px;font-weight:800;font-family:var(--font-display);
+      color:#fff;flex-shrink:0;border:2px solid rgba(255,255,255,.4);
+      text-transform:uppercase;
+    }
+    .profile-name-block{flex:1;min-width:0}
+    .profile-name{font-family:var(--font-display);font-size:1.2rem;font-weight:800;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .profile-sub{font-size:12px;opacity:.8;margin-top:2px}
+    .btn-edit-profile{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);color:#fff;border-radius:var(--radius-sm);padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-body);white-space:nowrap;transition:var(--tr);flex-shrink:0}
+    .btn-edit-profile:hover{background:rgba(255,255,255,.3)}
+
+    /* ── DEADLINE STRIP ── */
+    .deadline-strip{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    .deadline-item{background:rgba(255,255,255,.15);border-radius:var(--radius-sm);padding:10px 12px;text-align:center;border:1px solid rgba(255,255,255,.2)}
+    .deadline-label{font-size:10px;font-weight:600;opacity:.8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+    .deadline-value{font-family:var(--font-display);font-size:1.25rem;font-weight:800;line-height:1}
+    .deadline-sub{font-size:10px;opacity:.75;margin-top:2px}
+    .deadline-item.urgent .deadline-value{color:#ffe08a}
+    .deadline-item.done-item .deadline-value{color:#86efb8}
+
+    /* ── SETUP SCREEN (shown when no profile) ── */
+    #setupScreen{display:none;position:fixed;inset:0;background:var(--bg);z-index:800;overflow-y:auto;padding:var(--sat) 0 var(--sab)}
+    #setupScreen.show{display:block}
+    .setup-inner{max-width:440px;margin:0 auto;padding:40px 24px}
+    .setup-logo{font-family:var(--font-display);font-size:2rem;font-weight:800;margin-bottom:6px}
+    .setup-logo span{color:var(--accent)}
+    .setup-desc{color:var(--text-muted);font-size:14px;margin-bottom:32px}
+    .setup-field{margin-bottom:16px}
+    .setup-field label{display:block;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+    .setup-field input{width:100%;font-family:var(--font-body);font-size:15px;font-weight:500;color:var(--text);background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;outline:none;transition:var(--tr)}
+    .setup-field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(224,92,42,.12)}
+    .setup-hint{font-size:12px;color:var(--text-muted);margin-top:5px}
+    .setup-btn{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-family:var(--font-display);font-size:15px;font-weight:800;cursor:pointer;transition:var(--tr);margin-top:8px}
+    .setup-btn:hover{background:var(--accent-dark);transform:translateY(-1px)}
+    .setup-error{color:var(--danger);font-size:13px;margin-top:-8px;margin-bottom:8px;display:none}
+    .setup-error.show{display:block}
+
+    /* ── BUTTONS ── */
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:var(--font-body);font-size:13px;font-weight:600;transition:var(--tr);white-space:nowrap}
+    .btn-primary{background:var(--accent);color:#fff;width:100%;justify-content:center;padding:13px;font-size:14px}
+    .btn-primary:hover{background:var(--accent-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(224,92,42,.35)}
+    .btn-primary:active{transform:translateY(0)}
+    .btn-ghost{background:transparent;color:var(--text-muted);border:1.5px solid var(--border)}
+    .btn-ghost:hover{background:var(--surface-2);color:var(--text)}
+    .btn-danger-ghost{background:transparent;color:var(--danger);border:1.5px solid transparent;padding:5px 8px;font-size:12px}
+    .btn-danger-ghost:hover{background:var(--danger-light);border-color:var(--danger)}
+    .btn-edit-ghost{background:transparent;color:var(--text-muted);border:1.5px solid transparent;padding:5px 8px;font-size:12px}
+    .btn-edit-ghost:hover{background:var(--accent-light);color:var(--accent);border-color:var(--accent)}
+    .toggle-dark{background:var(--surface);border:1.5px solid var(--border);border-radius:99px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;transition:var(--tr);flex-shrink:0}
+    .toggle-dark:hover{background:var(--surface-2)}
+
+    /* ── CARDS ── */
+    .card{background:var(--surface);border-radius:var(--radius);border:1.5px solid var(--border);box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
+
+    /* ── STATS ── */
+    .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+    .stat-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:14px 12px;text-align:center}
+    .stat-card.highlight{background:var(--accent-light);border-color:var(--accent)}
+    .stat-card.done{background:var(--green-light);border-color:var(--green)}
+    .stat-label{font-size:11px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+    .stat-value{font-family:var(--font-display);font-size:clamp(1.2rem,4vw,1.6rem);font-weight:800;line-height:1}
+    .stat-card.highlight .stat-value{color:var(--accent)}
+    .stat-card.done .stat-value{color:var(--green)}
+    .stat-sub{font-size:11px;color:var(--text-muted);margin-top:2px}
+
+    /* ── PROGRESS ── */
+    .progress-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .progress-label{font-size:13px;font-weight:600}
+    .progress-pct{font-family:var(--font-display);font-size:16px;font-weight:800;color:var(--accent)}
+    .progress-track{height:12px;background:var(--surface-2);border-radius:99px;overflow:hidden;border:1.5px solid var(--border)}
+    .progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#f5824a);transition:width .6s cubic-bezier(.4,0,.2,1)}
+    .progress-fill.complete{background:linear-gradient(90deg,var(--green),#4ec898)}
+
+    /* ── PACE ALERT ── */
+    .pace-alert{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:var(--radius-sm);font-size:13px;margin-top:12px;border:1.5px solid}
+    .pace-alert.good{background:var(--green-light);border-color:var(--green);color:var(--green)}
+    .pace-alert.warn{background:var(--warn-light);border-color:var(--warn);color:var(--warn)}
+    .pace-alert.behind{background:var(--danger-light);border-color:var(--danger);color:var(--danger)}
+    .pace-alert.neutral{background:var(--blue-light);border-color:var(--blue);color:var(--blue)}
+    .pace-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+    .pace-text{font-weight:500;line-height:1.4}
+
+    /* ── FORM ── */
+    .form-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+    @media(max-width:480px){.form-grid{grid-template-columns:1fr}}
+    .form-group{display:flex;flex-direction:column;gap:5px}
+    .form-group label{font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}
+    .form-group input{font-family:var(--font-body);font-size:14px;font-weight:500;color:var(--text);background:var(--surface-2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;outline:none;transition:var(--tr);width:100%}
+    .form-group input:focus{border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 3px rgba(224,92,42,.12)}
+    .form-group input.error{border-color:var(--danger)}
+    .error-msg{color:var(--danger);font-size:12px;font-weight:500;margin-top:-6px;display:none}
+    .error-msg.visible{display:block}
+
+    /* ── TABLE ── */
+    .table-wrapper{overflow-x:auto;border-radius:var(--radius-sm);border:1.5px solid var(--border)}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    thead{background:var(--surface-2)}
+    th{padding:10px 12px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);border-bottom:1.5px solid var(--border);white-space:nowrap}
+    td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tbody tr{transition:background .15s}
+    tbody tr:hover{background:var(--surface-2)}
+    .hours-badge{display:inline-block;background:var(--green-light);color:var(--green);border-radius:99px;padding:2px 9px;font-size:12px;font-weight:600}
+    .td-actions{display:flex;gap:4px;justify-content:flex-end}
+    .empty-state{text-align:center;padding:40px 20px;color:var(--text-muted)}
+    .empty-state .empty-icon{font-size:2.5rem;margin-bottom:10px;opacity:.5}
+    .empty-state p{font-size:14px}
+
+    /* ── TOAST ── */
+    .toast-container{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);z-index:1000;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+    .toast{background:var(--text);color:var(--bg);padding:10px 20px;border-radius:99px;font-size:13px;font-weight:500;box-shadow:var(--shadow-lg);animation:toastIn .3s cubic-bezier(.4,0,.2,1);white-space:nowrap}
+    .toast.success{background:var(--green);color:#fff}
+    .toast.error{background:var(--danger);color:#fff}
+    @keyframes toastIn{from{opacity:0;transform:translateY(12px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+    /* ── MODAL ── */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .25s}
+    .modal-overlay.open{display:flex;opacity:1;pointer-events:all}
+    .modal{background:var(--surface);border-radius:var(--radius);border:1.5px solid var(--border);box-shadow:var(--shadow-lg);padding:24px;width:100%;max-width:440px;transform:scale(.95) translateY(8px);transition:transform .25s cubic-bezier(.4,0,.2,1)}
+    .modal-overlay.open .modal{transform:scale(1) translateY(0)}
+    .modal h2{font-family:var(--font-display);font-size:1.2rem;font-weight:800;margin-bottom:4px}
+    .modal-desc{font-size:13px;color:var(--text-muted);margin-bottom:16px}
+    .modal-actions{display:flex;gap:8px;margin-top:16px}
+    .modal-actions .btn{flex:1;justify-content:center}
+
+    /* ── SECTION TITLE ── */
+    .section-title{font-family:var(--font-display);font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+    .section-title::after{content:'';flex:1;height:1.5px;background:var(--border);border-radius:99px}
+
+    /* ── TOOLBAR ── */
+    .toolbar{display:flex;justify-content:flex-end;padding:12px 16px 0}
+
+    /* ── OFFLINE BADGE ── */
+    #offlineBadge{display:none;background:var(--text-muted);color:var(--bg);font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;vertical-align:middle;margin-left:6px}
+    body.offline #offlineBadge{display:inline-block}
+
+    /* ── DIVIDER ── */
+    .modal-divider{height:1px;background:var(--border);margin:16px 0}
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       SETUP SCREEN (first-time onboarding)
+  ══════════════════════════════════════ -->
+  <div id="setupScreen">
+    <div class="setup-inner">
+      <div class="setup-logo">Intern<span>Log</span></div>
+      <p class="setup-desc">Let's set up your internship profile before we start tracking.</p>
+
+      <!-- Name -->
+      <div class="setup-field">
+        <label>Your Full Name</label>
+        <input type="text" id="setupName" placeholder="e.g. Juan dela Cruz" maxlength="60" autocomplete="name" />
+      </div>
+
+      <!-- Required Hours -->
+      <div class="setup-field">
+        <label>Required OJT Hours</label>
+        <input type="number" id="setupHours" placeholder="e.g. 486" min="1" max="9999" value="486" />
+        <div class="setup-hint">Total hours you need to complete (default is 486).</div>
+      </div>
+
+      <p class="setup-error" id="setupError">Please fill in all fields correctly.</p>
+      <button class="setup-btn" onclick="saveProfile()">Get Started →</button>
+    </div>
+  </div>
+
+  <!-- INSTALL BANNER -->
+  <div id="installBanner">
+    <p>Install InternLog
+      <span>Add to home screen for the full app experience</span>
+    </p>
+    <button class="banner-btn" id="installBtn">Install</button>
+    <button class="banner-dismiss" id="dismissBanner">✕</button>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       MAIN APP
+  ══════════════════════════════════════ -->
+  <div class="app-wrapper" id="mainApp" style="display:none">
+
+    <!-- HEADER -->
+    <div class="header">
+      <div class="header-left">
+        <h1>Intern<span class="accent">Log</span><span id="offlineBadge">Offline</span></h1>
+        <p id="headerSub">Track your internship progress</p>
+      </div>
+      <div class="header-actions">
+        <button class="toggle-dark" id="darkToggle">🌙</button>
+      </div>
+    </div>
+
+    <!-- ── PROFILE HERO ── -->
+    <div class="profile-hero" id="profileHero">
+      <div class="profile-top">
+        <div class="profile-avatar" id="profileAvatar">?</div>
+        <div class="profile-name-block">
+          <div class="profile-name" id="profileName">—</div>
+          <div class="profile-sub" id="profileSub">OJT Intern</div>
+        </div>
+        <button class="btn-edit-profile" onclick="openProfileModal()">✏️ Edit</button>
+      </div>
+      <!-- Deadline strip: remaining days, est. finish date, required hours -->
+      <div class="deadline-strip">
+        <div class="deadline-item" id="deadlineRemainingDays">
+          <div class="deadline-label">Days Left</div>
+          <div class="deadline-value" id="daysLeft">—</div>
+          <div class="deadline-sub">estimated</div>
+        </div>
+        <div class="deadline-item">
+          <div class="deadline-label">Est. Finish</div>
+          <div class="deadline-value" id="deadlineDate" style="font-size:1rem">—</div>
+          <div class="deadline-sub" id="deadlineDateSub">days remaining</div>
+        </div>
+        <div class="deadline-item">
+          <div class="deadline-label">Required</div>
+          <div class="deadline-value" id="requiredHoursDisplay">486</div>
+          <div class="deadline-sub">total hrs</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card highlight">
+        <div class="stat-label">Completed</div>
+        <div class="stat-value" id="statTotal">0</div>
+        <div class="stat-sub">hours</div>
+      </div>
+      <div class="stat-card" id="statRemainingCard">
+        <div class="stat-label">Remaining</div>
+        <div class="stat-value" id="statRemaining">486</div>
+        <div class="stat-sub">hours</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Days</div>
+        <div class="stat-value" id="statDays">0</div>
+        <div class="stat-sub">logged</div>
+      </div>
+    </div>
+
+    <!-- PROGRESS BAR -->
+    <div class="card">
+      <div class="progress-meta">
+        <span class="progress-label" id="progressLabel">Progress toward hours</span>
+        <span class="progress-pct" id="progressPct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+      <!-- Pace alert (shown when end date is set) -->
+      <div class="pace-alert neutral" id="paceAlert" style="display:none">
+        <span class="pace-icon">ℹ️</span>
+        <span class="pace-text" id="paceText"></span>
+      </div>
+    </div>
+
+    <!-- ADD ENTRY FORM -->
+    <div class="section-title">Add Entry</div>
+    <div class="card">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="inputDate">Date</label>
+          <input type="date" id="inputDate" />
+        </div>
+        <div class="form-group">
+          <label for="inputTimeIn">Time In</label>
+          <input type="time" id="inputTimeIn" value="08:00" />
+        </div>
+        <div class="form-group">
+          <label for="inputTimeOut">Time Out</label>
+          <input type="time" id="inputTimeOut" value="17:00" />
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label for="inputNotes">Notes / Remarks <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted)">(optional)</span></label>
+        <textarea id="inputNotes" rows="2" placeholder="e.g. Worked on inventory system, attended standup..." style="font-family:var(--font-body);font-size:14px;font-weight:500;color:var(--text);background:var(--surface-2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;outline:none;transition:var(--tr);width:100%;resize:vertical;line-height:1.5" onfocus="this.style.borderColor='var(--accent)';this.style.background='var(--surface)';this.style.boxShadow='0 0 0 3px rgba(224,92,42,.12)'" onblur="this.style.borderColor='';this.style.background='';this.style.boxShadow=''"></textarea>
+      </div>
+      <p class="error-msg" id="formError">⚠ Time Out must be after Time In.</p>
+      <button class="btn btn-primary" onclick="addEntry()">＋ &nbsp;Log Hours</button>
+    </div>
+
+    <!-- LOG TABLE -->
+    <div class="section-title">Log</div>
+    <div class="card" style="padding:0;overflow:visible">
+      <div class="toolbar">
+        <button class="btn btn-ghost" onclick="exportCSV()">↓ &nbsp;Export CSV</button>
+      </div>
+      <div id="tableArea"></div>
+    </div>
+
+  </div><!-- end .app-wrapper -->
+
+  <!-- ══════════════════════════════════════
+       EDIT ENTRY MODAL
+  ══════════════════════════════════════ -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <h2>✏️ Edit Entry</h2>
+      <input type="hidden" id="editIndex" />
+      <div class="form-grid" style="grid-template-columns:1fr;gap:12px">
+        <div class="form-group"><label>Date</label><input type="date" id="editDate" /></div>
+        <div class="form-group"><label>Time In</label><input type="time" id="editTimeIn" /></div>
+        <div class="form-group"><label>Time Out</label><input type="time" id="editTimeOut" /></div>
+        <div class="form-group">
+          <label>Notes / Remarks <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted)">(optional)</span></label>
+          <textarea id="editNotes" rows="2" placeholder="What did you work on?" style="font-family:var(--font-body);font-size:14px;font-weight:500;color:var(--text);background:var(--surface-2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;outline:none;transition:var(--tr);width:100%;resize:vertical;line-height:1.5" onfocus="this.style.borderColor='var(--accent)';this.style.background='var(--surface)';this.style.boxShadow='0 0 0 3px rgba(224,92,42,.12)'" onblur="this.style.borderColor='';this.style.background='';this.style.boxShadow=''"></textarea>
+        </div>
+      </div>
+      <p class="error-msg" id="editError">⚠ Time Out must be after Time In.</p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('editModal')">Cancel</button>
+        <button class="btn btn-primary" style="background:var(--accent)" onclick="saveEdit()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       EDIT PROFILE MODAL
+  ══════════════════════════════════════ -->
+  <div class="modal-overlay" id="profileModal">
+    <div class="modal">
+      <h2>👤 Edit Profile</h2>
+      <p class="modal-desc">Update your internship details below.</p>
+
+      <div class="form-grid" style="grid-template-columns:1fr;gap:12px">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="profileModalName" placeholder="Your name" maxlength="60" />
+        </div>
+        <div class="form-group">
+          <label>Required OJT Hours</label>
+          <input type="number" id="profileModalHours" placeholder="e.g. 486" min="1" max="9999" />
+        </div>
+      </div>
+
+      <div class="modal-divider"></div>
+      <p style="font-size:12px;color:var(--danger);margin-bottom:12px;font-weight:500">⚠ Danger Zone</p>
+      <button class="btn btn-danger-ghost" style="width:100%;justify-content:center;border-color:var(--danger)" onclick="resetAllData()">🗑 Reset All Data & Start Over</button>
+
+      <p class="error-msg" id="profileModalError" style="margin-top:10px">⚠ Please fill in name and hours.</p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('profileModal')">Cancel</button>
+        <button class="btn btn-primary" style="background:var(--accent)" onclick="saveProfileModal()">Save Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    // ═══════════════════════════════════════════════
+    // PWA SETUP
+    // ═══════════════════════════════════════════════
+
+    // Inline SVG Icon
+    const iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <rect width="512" height="512" rx="112" fill="#e05c2a"/>
+      <rect x="140" y="120" width="232" height="272" rx="16" fill="white"/>
+      <rect x="172" y="84" width="44" height="64" rx="12" fill="#e05c2a" opacity="0.9"/>
+      <rect x="296" y="84" width="44" height="64" rx="12" fill="#e05c2a" opacity="0.9"/>
+      <rect x="168" y="192" width="176" height="16" rx="8" fill="#e05c2a" opacity="0.8"/>
+      <rect x="168" y="228" width="140" height="12" rx="6" fill="#e05c2a" opacity="0.4"/>
+      <rect x="168" y="256" width="160" height="12" rx="6" fill="#e05c2a" opacity="0.4"/>
+      <rect x="168" y="284" width="120" height="12" rx="6" fill="#e05c2a" opacity="0.4"/>
+      <circle cx="364" cy="364" r="76" fill="#2e9e6b"/>
+      <rect x="348" y="326" width="16" height="60" rx="8" fill="white"/>
+      <rect x="326" y="348" width="60" height="16" rx="8" fill="white"/>
+    </svg>`;
+    const iconURL = 'data:image/svg+xml,' + encodeURIComponent(iconSVG);
+    document.getElementById('appleIcon').href = iconURL;
+
+    // Inline Manifest
+    const mLink = document.createElement('link');
+    mLink.rel  = 'manifest';
+    mLink.href = URL.createObjectURL(new Blob([JSON.stringify({
+      name:"InternLog – OJT Tracker", short_name:"InternLog",
+      description:"Track your OJT internship hours",
+      start_url:"./", display:"standalone",
+      background_color:"#f0ede8", theme_color:"#e05c2a",
+      orientation:"portrait-primary",
+      icons:[{src:iconURL,sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}]
+    })], {type:'application/manifest+json'}));
+    document.head.appendChild(mLink);
+
+    // Service Worker
+    if ('serviceWorker' in navigator) {
+      const sw = `const C='ojt-v3';
+        self.addEventListener('install',e=>{self.skipWaiting();});
+        self.addEventListener('activate',e=>{self.clients.claim();e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(n=>n!==C).map(n=>caches.delete(n)))));});
+        self.addEventListener('fetch',e=>{e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));});`;
+      navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'text/javascript'})),{scope:'./'}).catch(()=>{});
+    }
+
+    // Install Prompt
+    let deferredPrompt=null;
+    window.addEventListener('beforeinstallprompt',e=>{
+      e.preventDefault(); deferredPrompt=e;
+      if(!localStorage.getItem('ojt_banner_dismissed'))
+        document.getElementById('installBanner').classList.add('show');
+    });
+    document.getElementById('installBtn').addEventListener('click',async()=>{
+      if(!deferredPrompt)return;
+      deferredPrompt.prompt();
+      const{outcome}=await deferredPrompt.userChoice;
+      if(outcome==='accepted')showToast('App installed! 🎉','success');
+      deferredPrompt=null;
+      document.getElementById('installBanner').classList.remove('show');
+    });
+    document.getElementById('dismissBanner').addEventListener('click',()=>{
+      document.getElementById('installBanner').classList.remove('show');
+      localStorage.setItem('ojt_banner_dismissed','1');
+    });
+    if(window.matchMedia('(display-mode:standalone)').matches)
+      document.getElementById('installBanner').style.display='none';
+
+    // Online/Offline
+    const updateOnline=()=>document.body.classList.toggle('offline',!navigator.onLine);
+    window.addEventListener('online',updateOnline);
+    window.addEventListener('offline',updateOnline);
+    updateOnline();
+
+    // ═══════════════════════════════════════════════
+    // STORAGE KEYS
+    // ═══════════════════════════════════════════════
+    const KEY_ENTRIES = 'ojt_entries';
+    const KEY_PROFILE = 'ojt_profile';
+    const BREAK_HOURS = 1;
+
+    // ═══════════════════════════════════════════════
+    // PROFILE helpers
+    // ═══════════════════════════════════════════════
+    function loadProfile() {
+      const raw = localStorage.getItem(KEY_PROFILE);
+      return raw ? JSON.parse(raw) : null;
+    }
+    function saveProfileData(p) {
+      localStorage.setItem(KEY_PROFILE, JSON.stringify(p));
+    }
+
+    // ═══════════════════════════════════════════════
+    // ENTRIES helpers
+    // ═══════════════════════════════════════════════
+    const loadEntries = () => JSON.parse(localStorage.getItem(KEY_ENTRIES)||'[]');
+    const saveEntries = e  => localStorage.setItem(KEY_ENTRIES, JSON.stringify(e));
+
+    // ═══════════════════════════════════════════════
+    // HELPERS
+    // ═══════════════════════════════════════════════
+    const toMins  = t => { const[h,m]=t.split(':').map(Number); return h*60+m; };
+    const calcHrs = (i,o) => { const r=(toMins(o)-toMins(i))/60; return Math.round((r>BREAK_HOURS?r-BREAK_HOURS:r)*100)/100; };
+    const fmtDate = s => new Date(s+'T00:00:00').toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'});
+    const fmtTime = t => { const[h,m]=t.split(':').map(Number); return `${h%12||12}:${String(m).padStart(2,'0')} ${h>=12?'PM':'AM'}`; };
+    const today0  = () => { const d=new Date(); d.setHours(0,0,0,0); return d; };
+
+    /** Get initials (up to 2 letters) from a name string */
+    function initials(name) {
+      return name.trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    }
+
+    /** Days between today (00:00) and a YYYY-MM-DD date string (inclusive of end day) */
+    function daysUntil(dateStr) {
+      const end = new Date(dateStr+'T00:00:00');
+      const diff = end - today0();
+      return Math.ceil(diff / (1000*60*60*24));
+    }
+
+    // ═══════════════════════════════════════════════
+    // DARK MODE
+    // ═══════════════════════════════════════════════
+    const darkBtn = document.getElementById('darkToggle');
+    const applyTheme = d => {
+      document.documentElement.setAttribute('data-theme', d?'dark':'light');
+      darkBtn.textContent = d?'☀️':'🌙';
+      localStorage.setItem('ojt_dark', d?'1':'0');
+    };
+    applyTheme(localStorage.getItem('ojt_dark')==='1');
+    darkBtn.addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')!=='dark'));
+
+    // ═══════════════════════════════════════════════
+    // TOAST
+    // ═══════════════════════════════════════════════
+    function showToast(msg,type=''){
+      const c=document.getElementById('toastContainer');
+      const t=document.createElement('div');
+      t.className=`toast ${type}`; t.textContent=msg; c.appendChild(t);
+      setTimeout(()=>{ t.style.cssText='opacity:0;transform:translateY(12px);transition:all .3s'; setTimeout(()=>t.remove(),300); },2800);
+    }
+
+    // ═══════════════════════════════════════════════
+    // SETUP SCREEN
+    // ═══════════════════════════════════════════════
+    function showSetup() {
+      document.getElementById('setupScreen').classList.add('show');
+      document.getElementById('mainApp').style.display = 'none';
+    }
+
+    function saveProfile() {
+      const name    = document.getElementById('setupName').value.trim();
+      const hours   = parseInt(document.getElementById('setupHours').value);
+      const errEl   = document.getElementById('setupError');
+
+      if (!name || !hours || hours < 1) {
+        errEl.classList.add('show');
+        return;
+      }
+      errEl.classList.remove('show');
+      saveProfileData({ name, hours });
+      document.getElementById('setupScreen').classList.remove('show');
+      document.getElementById('mainApp').style.display = 'block';
+      render();
+      showToast(`Welcome, ${name}! 👋`, 'success');
+    }
+
+    // ═══════════════════════════════════════════════
+    // PROFILE MODAL (edit after setup)
+    // ═══════════════════════════════════════════════
+    function openProfileModal() {
+      const p = loadProfile();
+      if (!p) return;
+      document.getElementById('profileModalName').value    = p.name;
+      document.getElementById('profileModalHours').value   = p.hours;
+      document.getElementById('profileModalError').classList.remove('visible');
+      document.getElementById('profileModal').classList.add('open');
+    }
+
+    function saveProfileModal() {
+      const name    = document.getElementById('profileModalName').value.trim();
+      const hours   = parseInt(document.getElementById('profileModalHours').value);
+      const errEl   = document.getElementById('profileModalError');
+      if (!name || !hours || hours < 1) { errEl.classList.add('visible'); return; }
+      errEl.classList.remove('visible');
+      saveProfileData({ name, hours });
+      closeModal('profileModal');
+      render();
+      showToast('Profile updated ✅', 'success');
+    }
+
+    function resetAllData() {
+      if (!confirm('This will delete ALL entries and your profile. Are you sure?')) return;
+      localStorage.removeItem(KEY_ENTRIES);
+      localStorage.removeItem(KEY_PROFILE);
+      closeModal('profileModal');
+      showSetup();
+    }
+
+    // ═══════════════════════════════════════════════
+    // RENDER
+    // ═══════════════════════════════════════════════
+    function render() {
+      const profile  = loadProfile();
+      const entries  = loadEntries();
+      const required = profile ? profile.hours : 486;
+
+      const total     = entries.reduce((s,e)=>s+e.hours,0);
+      const remaining = Math.max(0, required - total);
+      const pct       = Math.min(100, (total/required)*100);
+
+      // ── Stats
+      document.getElementById('statTotal').textContent     = total.toFixed(1);
+      document.getElementById('statRemaining').textContent = remaining.toFixed(1);
+      document.getElementById('statDays').textContent      = entries.length;
+      document.getElementById('statRemainingCard').className = 'stat-card'+(remaining===0?' done':'');
+
+      // ── Progress bar
+      document.getElementById('progressLabel').textContent = `Progress toward ${required} hours`;
+      document.getElementById('progressPct').textContent   = pct.toFixed(1)+'%';
+      document.getElementById('progressFill').style.width  = pct+'%';
+      document.getElementById('progressFill').className    = 'progress-fill'+(pct>=100?' complete':'');
+
+      // ── Profile hero
+      if (profile) {
+        document.getElementById('profileName').textContent  = profile.name;
+        document.getElementById('profileAvatar').textContent = initials(profile.name);
+        document.getElementById('requiredHoursDisplay').textContent = profile.hours;
+        document.getElementById('headerSub').textContent    = `${profile.name}'s OJT progress`;
+
+        // Auto-calculate estimated finish date from average daily pace
+        const dlEl   = document.getElementById('daysLeft');
+        const dlCard = document.getElementById('deadlineRemainingDays');
+        const dateEl = document.getElementById('deadlineDate');
+
+        if (remaining <= 0) {
+          dlEl.textContent  = '0';
+          dateEl.textContent = 'Done 🎉';
+          document.getElementById('deadlineDateSub').textContent = 'all done!';
+          dlCard.classList.add('done-item');
+          document.getElementById('profileSub').textContent = 'OJT Hours Completed!';
+          document.getElementById('paceAlert').style.display = 'none';
+        } else if (entries.length >= 1) {
+          const avgPerDay  = total / entries.length;
+          const daysNeeded = Math.ceil(remaining / avgPerDay);
+          dlEl.textContent   = daysNeeded;
+          dateEl.textContent = `in ${daysNeeded} day${daysNeeded===1?'':'s'}`;
+          document.getElementById('deadlineDateSub').textContent = 'at current pace';
+          dlCard.classList.remove('urgent','done-item');
+          if (daysNeeded <= 7) dlCard.classList.add('urgent');
+          document.getElementById('profileSub').textContent = `Est. finish in ${daysNeeded} day${daysNeeded===1?'':'s'}`;
+          if (entries.length >= 2) renderPaceAlert(total, remaining, daysNeeded, required);
+          else document.getElementById('paceAlert').style.display = 'none';
+        } else {
+          dlEl.textContent   = '—';
+          dateEl.textContent = '—';
+          document.getElementById('deadlineDateSub').textContent = 'log days to see';
+          document.getElementById('profileSub').textContent = 'OJT Intern';
+          document.getElementById('paceAlert').style.display = 'none';
+        }
+      }
+
+      // ── Table
+      renderTable(entries);
+    }
+
+    /** Shows a smart pace message based on average daily pace */
+    function renderPaceAlert(totalDone, remaining, daysNeeded, required) {
+      const alertEl = document.getElementById('paceAlert');
+      const textEl  = document.getElementById('paceText');
+
+      if (remaining <= 0) {
+        alertEl.className='pace-alert good';
+        textEl.textContent=`🎉 All ${required} hours completed! Great job!`;
+        alertEl.style.display='flex'; return;
+      }
+
+      const entries   = loadEntries();
+      const avgPerDay = entries.length > 0 ? totalDone / entries.length : 0;
+
+      if (avgPerDay === 0) {
+        alertEl.className='pace-alert neutral';
+        textEl.textContent=`Log more days to see your pace estimate.`;
+        alertEl.style.display='flex'; return;
+      }
+
+      const needed = (remaining / daysNeeded).toFixed(2);
+
+      if (daysNeeded <= 30) {
+        alertEl.className='pace-alert good';
+        textEl.textContent=`✅ Great pace! At ${avgPerDay.toFixed(2)} hrs/day avg, you'll finish in ~${daysNeeded} days (${needed} hrs/day needed).`;
+      } else if (daysNeeded <= 60) {
+        alertEl.className='pace-alert warn';
+        textEl.textContent=`⚠️ Moderate pace. You'll finish in ~${daysNeeded} days at ${avgPerDay.toFixed(2)} hrs/day. Try to increase to ${needed} hrs/day.`;
+      } else {
+        alertEl.className='pace-alert behind';
+        textEl.textContent=`🚨 Slow pace! At current rate it'll take ~${daysNeeded} days. Aim for ${needed} hrs/day to finish sooner.`;
+      }
+      alertEl.style.display='flex';
+    }
+
+    function renderTable(entries) {
+      const area = document.getElementById('tableArea');
+      if (!entries.length) {
+        area.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><p>No entries yet. Log your first day above!</p></div>`;
+        return;
+      }
+      const rows=[...entries].reverse().map((e,ri)=>{
+        const idx=entries.length-1-ri;
+        const notesText = e.notes ? e.notes.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : '';
+        const notesHtml = notesText
+          ? `<div style="font-size:11px;color:var(--text-muted);margin-top:3px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${notesText}">📝 ${notesText}</div>`
+          : '<span style="color:var(--border);font-size:12px">—</span>';
+        return `<tr>
+          <td>${fmtDate(e.date)}</td>
+          <td>${fmtTime(e.timeIn)}</td>
+          <td>${fmtTime(e.timeOut)}</td>
+          <td><span class="hours-badge">${e.hours.toFixed(2)}h</span></td>
+          <td>${notesHtml}</td>
+          <td><div class="td-actions">
+            <button class="btn btn-edit-ghost" data-edit="${idx}">✏️</button>
+            <button class="btn btn-danger-ghost" data-del="${idx}">🗑</button>
+          </div></td>
+        </tr>`;
+      }).join('');
+      area.innerHTML=`<div class="table-wrapper"><table>
+        <thead><tr><th>Date</th><th>Time In</th><th>Time Out</th><th>Hours</th><th>Notes</th><th style="text-align:right">Actions</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>`;
+    }
+
+    // ═══════════════════════════════════════════════
+    // ADD ENTRY
+    // ═══════════════════════════════════════════════
+    function addEntry() {
+      const d=document.getElementById('inputDate').value;
+      const i=document.getElementById('inputTimeIn').value;
+      const o=document.getElementById('inputTimeOut').value;
+      const err=document.getElementById('formError');
+      if (!d){showToast('Please select a date.','error');return;}
+      if (toMins(o)<=toMins(i)){
+        err.classList.add('visible');
+        document.getElementById('inputTimeOut').classList.add('error');
+        return;
+      }
+      err.classList.remove('visible');
+      document.getElementById('inputTimeOut').classList.remove('error');
+      const notes = document.getElementById('inputNotes').value.trim();
+      const entry={date:d,timeIn:i,timeOut:o,hours:calcHrs(i,o),notes};
+      const entries=loadEntries(); entries.push(entry); saveEntries(entries);
+      showToast(`✅ Logged ${entry.hours.toFixed(2)} hours`,'success');
+      render();
+      document.getElementById('inputDate').value='';
+      document.getElementById('inputNotes').value='';
+    }
+
+    // ═══════════════════════════════════════════════
+    // DELETE
+    // ═══════════════════════════════════════════════
+    function deleteEntry(idx){
+      if(!confirm('Delete this entry?'))return;
+      const e=loadEntries(); e.splice(idx,1); saveEntries(e);
+      showToast('Entry deleted.'); render();
+    }
+
+    // ═══════════════════════════════════════════════
+    // EDIT ENTRY MODAL
+    // ═══════════════════════════════════════════════
+    function openEdit(idx){
+      const e=loadEntries()[idx];
+      document.getElementById('editIndex').value=idx;
+      document.getElementById('editDate').value=e.date;
+      document.getElementById('editTimeIn').value=e.timeIn;
+      document.getElementById('editTimeOut').value=e.timeOut;
+      document.getElementById('editNotes').value=e.notes||'';
+      document.getElementById('editError').classList.remove('visible');
+      document.getElementById('editModal').classList.add('open');
+    }
+    function saveEdit(){
+      const idx=parseInt(document.getElementById('editIndex').value);
+      const d=document.getElementById('editDate').value;
+      const i=document.getElementById('editTimeIn').value;
+      const o=document.getElementById('editTimeOut').value;
+      const err=document.getElementById('editError');
+      if(!d){showToast('Please select a date.','error');return;}
+      if(toMins(o)<=toMins(i)){err.classList.add('visible');return;}
+      err.classList.remove('visible');
+      const notes=document.getElementById('editNotes').value.trim();
+      const entries=loadEntries();
+      entries[idx]={date:d,timeIn:i,timeOut:o,hours:calcHrs(i,o),notes};
+      saveEntries(entries);
+      showToast('✅ Entry updated.','success');
+      closeModal('editModal'); render();
+    }
+
+    // ═══════════════════════════════════════════════
+    // MODAL HELPERS
+    // ═══════════════════════════════════════════════
+    function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+    document.getElementById('editModal').addEventListener('click',function(e){if(e.target===this)closeModal('editModal');});
+    document.getElementById('profileModal').addEventListener('click',function(e){if(e.target===this)closeModal('profileModal');});
+
+    // ── Event delegation for table buttons (edit / delete)
+    document.addEventListener('click', function(e) {
+      const editBtn = e.target.closest('[data-edit]');
+      const delBtn  = e.target.closest('[data-del]');
+      if (editBtn) openEdit(parseInt(editBtn.dataset.edit));
+      if (delBtn)  deleteEntry(parseInt(delBtn.dataset.del));
+    });
+
+    // ═══════════════════════════════════════════════
+    // EXPORT CSV
+    // ═══════════════════════════════════════════════
+    function exportCSV(){
+      const entries=loadEntries();
+      if(!entries.length){showToast('No entries to export.','error');return;}
+      const profile=loadProfile();
+      const csv=[
+        [`Name:${profile?profile.name:''}`,`Required Hours:${profile?profile.hours:486}`],
+        [],
+        ['Date','Time In','Time Out','Hours Worked','Notes'],
+        ...entries.map(e=>[e.date,e.timeIn,e.timeOut,e.hours.toFixed(2),`"${(e.notes||'').replace(/"/g,'""')}"`])
+      ].map(r=>r.join(',')).join('\n');
+      const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([csv],{type:'text/csv'})),download:'ojt_hours.csv'});
+      a.click(); showToast('CSV exported!','success');
+    }
+
+    // ═══════════════════════════════════════════════
+    // INIT
+    // ═══════════════════════════════════════════════
+    (() => {
+      // Set default date to today
+      const d=new Date(), pad=n=>String(n).padStart(2,'0');
+      document.getElementById('inputDate').value=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+
+      // Check if profile exists
+      const profile = loadProfile();
+      if (!profile) {
+        showSetup();
+      } else {
+        document.getElementById('mainApp').style.display = 'block';
+        render();
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -11,6 +11,7 @@
   <title>InternLog – OJT Hours Tracker</title>
   <link rel="apple-touch-icon" id="appleIcon" />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <style>
     /* ── TOKENS ── */
@@ -226,6 +227,12 @@
 
     /* ── DIVIDER ── */
     .modal-divider{height:1px;background:var(--border);margin:16px 0}
+
+    /* ── QR CODE ── */
+    .qr-container{display:flex;flex-direction:column;align-items:center;gap:16px;padding:20px 0}
+    #qrcode{padding:12px;background:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.05)}
+    #qrcode img{display:block}
+    .qr-url{font-size:11px;color:var(--text-muted);word-break:break-all;text-align:center;max-width:240px;margin-top:4px}
   </style>
 </head>
 <body>
@@ -277,6 +284,7 @@
         <p id="headerSub">Track your internship progress</p>
       </div>
       <div class="header-actions">
+        <button class="toggle-dark" id="qrBtn" onclick="openQRModal()" title="Share QR Code">📱</button>
         <button class="toggle-dark" id="darkToggle">🌙</button>
       </div>
     </div>
@@ -441,6 +449,23 @@
       <div class="modal-actions">
         <button class="btn btn-ghost" onclick="closeModal('profileModal')">Cancel</button>
         <button class="btn btn-primary" style="background:var(--accent)" onclick="saveProfileModal()">Save Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       QR CODE MODAL
+  ══════════════════════════════════════ -->
+  <div class="modal-overlay" id="qrModal">
+    <div class="modal" style="max-width:320px">
+      <h2 style="text-align:center">📱 Share App</h2>
+      <p class="modal-desc" style="text-align:center">Scan to open InternLog on your mobile phone.</p>
+      <div class="qr-container">
+        <div id="qrcode"></div>
+        <div class="qr-url" id="qrUrl">...</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" style="background:var(--accent)" onclick="closeModal('qrModal')">Close</button>
       </div>
     </div>
   </div>
@@ -861,6 +886,27 @@
     function closeModal(id){ document.getElementById(id).classList.remove('open'); }
     document.getElementById('editModal').addEventListener('click',function(e){if(e.target===this)closeModal('editModal');});
     document.getElementById('profileModal').addEventListener('click',function(e){if(e.target===this)closeModal('profileModal');});
+    document.getElementById('qrModal').addEventListener('click',function(e){if(e.target===this)closeModal('qrModal');});
+
+    let qrInstance = null;
+    function openQRModal() {
+      const url = window.location.href;
+      document.getElementById('qrUrl').textContent = url;
+      
+      const qrContainer = document.getElementById('qrcode');
+      qrContainer.innerHTML = ''; // Clear previous QR
+      
+      qrInstance = new QRCode(qrContainer, {
+        text: url,
+        width: 200,
+        height: 200,
+        colorDark : "#1a1714",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+      });
+      
+      document.getElementById('qrModal').classList.add('open');
+    }
 
     // ── Event delegation for table buttons (edit / delete)
     document.addEventListener('click', function(e) {

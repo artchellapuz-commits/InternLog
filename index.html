@@ -390,7 +390,7 @@
           <button class="btn btn-ghost" onclick="exportCSV()" title="Export CSV">↓ CSV</button>
           <button class="btn btn-ghost" onclick="exportJSON()" title="Export Backup">💾 Backup</button>
           <button class="btn btn-ghost" onclick="triggerImport()" title="Restore from Backup">📂 Restore</button>
-          <input type="file" id="importFile" style="display:none" accept=".json,.csv" onchange="importFile(event)" />
+          <input type="file" id="importFile" style="display:none" accept=".json,.csv,text/csv,application/json,application/vnd.ms-excel" onchange="importFile(event)" />
         </div>
       </div>
       <div id="tableArea"></div>
@@ -991,16 +991,24 @@
         try {
           let data;
           const content = e.target.result;
+          const fileName = file.name.toLowerCase();
+          const fileType = file.type.toLowerCase();
 
-          if (file.name.endsWith('.json')) {
+          // Check both extension and MIME type for better mobile compatibility
+          if (fileName.endsWith('.json') || fileType === 'application/json') {
             data = JSON.parse(content);
             if (!data.entries || !Array.isArray(data.entries)) {
               throw new Error('Invalid backup file');
             }
-          } else if (file.name.endsWith('.csv')) {
+          } else if (fileName.endsWith('.csv') || fileType === 'text/csv' || fileType === 'application/vnd.ms-excel') {
             data = parseCSV(content);
           } else {
-            throw new Error('Unsupported file format');
+            // Fallback: try to parse as CSV if extension or type is missing but content looks like CSV
+            if (content.includes('Name:') && content.includes('Date,')) {
+              data = parseCSV(content);
+            } else {
+              throw new Error('Unsupported file format');
+            }
           }
           
           if (confirm('Importing will overwrite your current data. Continue?')) {

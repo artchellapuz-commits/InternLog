@@ -390,7 +390,7 @@
           <button class="btn btn-ghost" onclick="exportCSV()" title="Export CSV">↓ CSV</button>
           <button class="btn btn-ghost" onclick="exportJSON()" title="Export Backup">💾 Backup</button>
           <button class="btn btn-ghost" onclick="triggerImport()" title="Restore from Backup">📂 Restore</button>
-          <input type="file" id="importFile" style="display:none" accept=".json" onchange="importJSON(event)" />
+          <input type="file" id="importFile" style="display:none" accept=".json,.csv" onchange="importFile(event)" />
         </div>
       </div>
       <div id="tableArea"></div>
@@ -952,16 +952,55 @@
       document.getElementById('importFile').click();
     }
 
-    function importJSON(event) {
+    function parseCSV(text) {
+      const lines = text.split(/\r?\n/);
+      if (lines.length < 4) throw new Error('Invalid CSV format');
+
+      // Parse Profile from Line 1: "Name:Value,Required Hours:Value"
+      const profileLine = lines[0].split(',');
+      const name = profileLine[0].replace('Name:', '').trim();
+      const hours = parseInt(profileLine[1].replace('Required Hours:', '').trim());
+
+      // Parse Entries from Line 4 onwards
+      const entries = [];
+      for (let i = 3; i < lines.length; i++) {
+        if (!lines[i].trim()) continue;
+        
+        // Simple CSV parser for quoted fields
+        const matches = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+        if (!matches || matches.length < 4) continue;
+
+        const date = matches[0].replace(/"/g, '').trim();
+        const timeIn = matches[1].replace(/"/g, '').trim();
+        const timeOut = matches[2].replace(/"/g, '').trim();
+        const hoursWorked = parseFloat(matches[3].replace(/"/g, '').trim());
+        const notes = matches[4] ? matches[4].replace(/^"|"$/g, '').replace(/""/g, '"').trim() : '';
+
+        entries.push({ date, timeIn, timeOut, hours: hoursWorked, notes });
+      }
+
+      return { profile: { name, hours }, entries };
+    }
+
+    function importFile(event) {
       const file = event.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
       reader.onload = function(e) {
         try {
-          const data = JSON.parse(e.target.result);
-          if (!data.entries || !Array.isArray(data.entries)) {
-            throw new Error('Invalid backup file');
+          let data;
+          const content = e.target.result;
+
+          if (file.name.endsWith('.json')) {
+            data = JSON.parse(content);
+            if (!data.entries || !Array.isArray(data.entries)) {
+              throw new Error('Invalid backup file');
+            }
+          } else if (file.name.endsWith('.csv')) {
+            data = parseCSV(content);
+          } else {
+            throw new Error('Unsupported file format');
           }
           
           if (confirm('Importing will overwrite your current data. Continue?')) {
@@ -972,6 +1011,7 @@
           }
         } catch (err) {
           showToast('Failed to import: ' + err.message, 'error');
+          console.error(err);
         }
         event.target.value = ''; // Reset input
       };

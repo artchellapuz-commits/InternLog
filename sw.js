@@ -1,4 +1,4 @@
-const CACHE_NAME = 'internlog-cache-v1';
+const CACHE_NAME = 'internlog-cache-v2'; // Changed from v1 to v2
 const urlsToCache = [
   '/',
   'index.html',
@@ -14,6 +14,20 @@ self.addEventListener('install', event => {
   );
 });
 
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
+
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
@@ -21,7 +35,7 @@ self.addEventListener('fetch', event => {
         if (response) {
           return response;
         }
-        return fetch(event.request);
+        return fetch(event.request).catch(() => caches.match('index.html'));
       })
   );
 });

@@ -995,45 +995,50 @@
       return { profile: { name, hours }, entries };
     }
 
+    function processImportData(content, fileName, fileType) {
+      try {
+        let data;
+        const nameLower = fileName.toLowerCase();
+        const typeLower = fileType ? fileType.toLowerCase() : '';
+
+        // Check both extension and MIME type for better mobile compatibility
+        if (nameLower.endsWith('.json') || typeLower === 'application/json') {
+          data = JSON.parse(content);
+          if (!data.entries || !Array.isArray(data.entries)) {
+            throw new Error('Invalid backup file');
+          }
+        } else if (nameLower.endsWith('.csv') || typeLower === 'text/csv' || typeLower === 'application/vnd.ms-excel') {
+          data = parseCSV(content);
+        } else {
+          // Fallback: try to parse as CSV if extension or type is missing but content looks like CSV
+          if (content.includes('Name:') && content.includes('Date,')) {
+            data = parseCSV(content);
+          } else {
+            throw new Error('Unsupported file format');
+          }
+        }
+        
+        if (confirm('Importing will overwrite your current data. Continue?')) {
+          if (data.profile) saveProfileData(data.profile);
+          saveEntries(data.entries);
+          render();
+          showToast('Data restored successfully! 📂', 'success');
+          return true;
+        }
+      } catch (err) {
+        showToast('Failed to import: ' + err.message, 'error');
+        console.error(err);
+      }
+      return false;
+    }
+
     function importFile(event) {
       const file = event.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
       reader.onload = function(e) {
-        try {
-          let data;
-          const content = e.target.result;
-          const fileName = file.name.toLowerCase();
-          const fileType = file.type.toLowerCase();
-
-          // Check both extension and MIME type for better mobile compatibility
-          if (fileName.endsWith('.json') || fileType === 'application/json') {
-            data = JSON.parse(content);
-            if (!data.entries || !Array.isArray(data.entries)) {
-              throw new Error('Invalid backup file');
-            }
-          } else if (fileName.endsWith('.csv') || fileType === 'text/csv' || fileType === 'application/vnd.ms-excel') {
-            data = parseCSV(content);
-          } else {
-            // Fallback: try to parse as CSV if extension or type is missing but content looks like CSV
-            if (content.includes('Name:') && content.includes('Date,')) {
-              data = parseCSV(content);
-            } else {
-              throw new Error('Unsupported file format');
-            }
-          }
-          
-          if (confirm('Importing will overwrite your current data. Continue?')) {
-            if (data.profile) saveProfileData(data.profile);
-            saveEntries(data.entries);
-            render();
-            showToast('Data restored successfully! 📂', 'success');
-          }
-        } catch (err) {
-          showToast('Failed to import: ' + err.message, 'error');
-          console.error(err);
-        }
+        processImportData(e.target.result, file.name, file.type);
         event.target.value = ''; // Reset input
       };
       reader.readAsText(file);
@@ -1044,10 +1049,16 @@
     // ═══════════════════════════════════════════════
     (() => {
       // Handle shared files via Share Target API
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('message', event => {
+          if (event.data && event.data.type === 'file-shared') {
+            processImportData(event.data.text, event.data.fileName || 'shared.csv', 'text/csv');
+          }
+        });
+      }
+
       window.addEventListener('load', () => {
         if (window.location.search.includes('share-target')) {
-          // This is a placeholder. The actual file is handled by the service worker.
-          // We just need to show a toast or some feedback.
           showToast('Processing shared file...', 'success');
         }
       });

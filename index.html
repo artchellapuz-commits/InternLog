@@ -390,7 +390,7 @@
           <button class="btn btn-ghost" onclick="exportCSV()" title="Export CSV">↓ CSV</button>
           <button class="btn btn-ghost" onclick="exportJSON()" title="Export Backup">💾 Backup</button>
           <button class="btn btn-ghost" onclick="triggerImport()" title="Restore from Backup">📂 Restore</button>
-          <input type="file" id="importFile" style="display:none" accept=".json,.csv,text/csv,text/plain,application/json,application/vnd.ms-excel,text/*" onchange="importFile(event)" />
+          <input type="file" id="importFile" style="display:none" accept="*/*" onchange="importFile(event)" />
         </div>
       </div>
       <div id="tableArea"></div>
@@ -512,7 +512,7 @@
           files: [
             {
               name: 'file',
-              accept: ['text/csv', '.csv']
+              accept: ['*/*']
             }
           ]
         }

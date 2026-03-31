@@ -1,4 +1,4 @@
-const CACHE_NAME = 'internlog-cache-v4'; // Updated for share target support
+const CACHE_NAME = 'internlog-cache-v5'; // Updated accept types for better mobile support
 const urlsToCache = [
   '/',
   'index.html',

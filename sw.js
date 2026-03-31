@@ -1,7 +1,7 @@
 const CACHE_NAME = 'internlog-cache-v1';
 const urlsToCache = [
   '/',
-  'internlog (1).html',
+  'index.html',
 ];
 
 self.addEventListener('install', event => {

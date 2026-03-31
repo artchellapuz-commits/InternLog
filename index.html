@@ -355,7 +355,11 @@
     </div>
 
     <!-- ADD ENTRY FORM -->
-    <div class="section-title">Add Entry</div>
+    <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
+      <span>Add Entry</span>
+      <button id="scanBtn" class="btn btn-ghost" style="padding:4px 8px; font-size:12px; height:auto" onclick="document.getElementById('scanDtrInput').click()" title="Scan DTR or Screenshot">📷 Scan DTR</button>
+      <input type="file" id="scanDtrInput" accept="image/*" style="display:none" onchange="processDTRScan(event)" />
+    </div>
     <div class="card">
       <div class="form-grid">
         <div class="form-group">
@@ -578,7 +582,11 @@
     // ═══════════════════════════════════════════════
     // ENTRIES helpers
     // ═══════════════════════════════════════════════
-    const loadEntries = () => JSON.parse(localStorage.getItem(KEY_ENTRIES)||'[]');
+    const loadEntries = () => {
+      const entries = JSON.parse(localStorage.getItem(KEY_ENTRIES)||'[]');
+      // Sort entries by date (newest first). Change to a.date.localeCompare(b.date) for oldest first.
+      return entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+    };
     const saveEntries = e  => localStorage.setItem(KEY_ENTRIES, JSON.stringify(e));
 
     // ═══════════════════════════════════════════════
@@ -944,6 +952,90 @@
       ].map(r=>r.join(',')).join('\n');
       const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([csv],{type:'text/csv'})),download:'ojt_hours.csv'});
       a.click(); showToast('CSV exported!','success');
+    }
+
+    // ═══════════════════════════════════════════════
+    // OCR SCANNER (TESSERACT)
+    // ═══════════════════════════════════════════════
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+
+    async function processDTRScan(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const scanBtn = document.getElementById('scanBtn');
+      const originalText = scanBtn.textContent;
+      
+      showToast('Scanning image... please wait ⏳', 'neutral');
+      scanBtn.textContent = '⏳ Scanning...';
+      scanBtn.disabled = true;
+
+      try {
+        // Dynamically load Tesseract if not loaded
+        if (typeof Tesseract === 'undefined') {
+          await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
+        }
+
+        const worker = await Tesseract.createWorker('eng');
+        const ret = await worker.recognize(file);
+        const text = ret.data.text;
+        await worker.terminate();
+
+        console.log("OCR Text Extracted:", text);
+
+        // Attempt to parse text
+        const timeRegex = /\b(?:(?:0?[1-9]|1[0-2]):[0-5][0-9]\s*[APap][Mm]|(?:[01]?[0-9]|2[0-3]):[0-5][0-9])\b/g;
+        const times = text.match(timeRegex);
+
+        // Standardize time to HH:MM format for input[type="time"]
+        const parseTimeStr = (ts) => {
+          let [time, ampm] = ts.trim().split(/\s+/);
+          if (!ampm && time.toLowerCase().includes('a')) ampm = 'AM';
+          if (!ampm && time.toLowerCase().includes('p')) ampm = 'PM';
+          
+          let [h, m] = time.replace(/[^\d:]/g, '').split(':').map(Number);
+          if (ampm) {
+            if (ampm.toUpperCase() === 'PM' && h < 12) h += 12;
+            if (ampm.toUpperCase() === 'AM' && h === 12) h = 0;
+          }
+          return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+        };
+
+        if (times && times.length >= 2) {
+          document.getElementById('inputTimeIn').value = parseTimeStr(times[0]);
+          document.getElementById('inputTimeOut').value = parseTimeStr(times[times.length - 1]);
+          
+          // Try to find a date (MM/DD/YYYY, YYYY-MM-DD)
+          const dateRegex = /\b(?:\d{4}-\d{2}-\d{2}|\d{1,2}\/\d{1,2}\/\d{2,4})\b/;
+          const dateMatch = text.match(dateRegex);
+          if (dateMatch) {
+            let d = new Date(dateMatch[0]);
+            if (!isNaN(d.getTime())) {
+               document.getElementById('inputDate').value = d.toISOString().split('T')[0];
+            }
+          }
+          
+          showToast('Data extracted! Please verify before saving. ✨', 'success');
+        } else {
+          showToast('Could not detect clear times in the image.', 'error');
+        }
+
+      } catch (err) {
+        console.error('OCR Error:', err);
+        showToast('Error scanning image.', 'error');
+      } finally {
+        scanBtn.textContent = originalText;
+        scanBtn.disabled = false;
+        event.target.value = ''; // reset input
+      }
     }
 
     function exportJSON() {

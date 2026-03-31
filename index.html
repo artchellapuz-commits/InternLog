@@ -503,7 +503,20 @@
       start_url:"./", display:"standalone",
       background_color:"#f0ede8", theme_color:"#e05c2a",
       orientation:"portrait-primary",
-      icons:[{src:iconURL,sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}]
+      icons:[{src:iconURL,sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}],
+      share_target: {
+        action: './',
+        method: 'POST',
+        enctype: 'multipart/form-data',
+        params: {
+          files: [
+            {
+              name: 'file',
+              accept: ['text/csv', '.csv']
+            }
+          ]
+        }
+      }
     })], {type:'application/manifest+json'}));
     document.head.appendChild(mLink);
 
@@ -1030,6 +1043,15 @@
     // INIT
     // ═══════════════════════════════════════════════
     (() => {
+      // Handle shared files via Share Target API
+      window.addEventListener('load', () => {
+        if (window.location.search.includes('share-target')) {
+          // This is a placeholder. The actual file is handled by the service worker.
+          // We just need to show a toast or some feedback.
+          showToast('Processing shared file...', 'success');
+        }
+      });
+
       // Set default date to today
       const d=new Date(), pad=n=>String(n).padStart(2,'0');
       document.getElementById('inputDate').value=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;

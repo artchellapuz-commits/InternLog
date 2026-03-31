@@ -1,4 +1,4 @@
-const CACHE_NAME = 'internlog-cache-v2'; // Changed from v1 to v2
+const CACHE_NAME = 'internlog-cache-v3'; // Changed from v2 to v3
 const urlsToCache = [
   '/',
   'index.html',
@@ -29,6 +29,21 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  // Handle Share Target POST requests
+  if (event.request.method === 'POST') {
+    event.respondWith(Response.redirect('./?share-target'));
+    event.waitUntil(async function () {
+      const formData = await event.request.formData();
+      const file = formData.get('file');
+      if (!file) return;
+
+      const text = await file.text();
+      const client = await self.clients.get(event.resultingClientId || (await self.clients.matchAll())[0].id);
+      client.postMessage({ type: 'file-shared', text });
+    }());
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then(response => {

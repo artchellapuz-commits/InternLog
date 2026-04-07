@@ -259,6 +259,7 @@
     .otl-cal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
     .otl-cal-title{font-family:var(--font-display);font-size:1rem;font-weight:800}
     .otl-cal-sub{font-size:12px;color:var(--text-muted);margin-top:2px}
+    .otl-cal-toggle{background:transparent;border:none;color:var(--text-muted);font-size:12px;cursor:pointer;padding:0 4px;text-decoration:underline;text-underline-offset:2px}
     .otl-cal-nav{display:flex;gap:6px;align-items:center}
     .otl-cal-nav button{background:var(--surface-2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);color:var(--text);transition:var(--tr)}
     .otl-cal-nav button:hover{background:var(--surface)}
@@ -447,6 +448,12 @@
         <div class="setup-hint">Subtracted from each day when time out − time in is longer than this (e.g. lunch).</div>
       </div>
 
+      <div class="setup-field">
+        <label>Target hours per workday</label>
+        <input type="number" id="setupDailyGoal" value="6" min="0" max="24" step="0.25" />
+        <div class="setup-hint">Used to compare today’s logged hours vs your daily goal.</div>
+      </div>
+
       <p class="setup-error" id="setupError">Please fill in all fields correctly.</p>
       <button class="setup-btn" onclick="saveProfile()">Get Started →</button>
     </div>
@@ -547,6 +554,11 @@
       <div class="summary-weeks" id="summaryWeeksBlock"></div>
     </div>
 
+    <div class="card" id="achievementsCard">
+      <div class="section-title" style="margin-bottom:8px">Achievements</div>
+      <ul id="achievementsList" style="font-size:13px;color:var(--text-muted);padding-left:18px;margin:0;"></ul>
+    </div>
+
     <div class="card otl-cal" id="otlCalendarCard">
       <div class="otl-cal-head">
         <div>
@@ -554,19 +566,22 @@
           <div class="otl-cal-sub" id="otlCalMonthStat">0.0 hours this month · tap a day for details</div>
         </div>
         <div class="otl-cal-nav">
+          <button type="button" class="otl-cal-toggle" id="otlCalToggle" aria-expanded="true">Hide</button>
           <button type="button" id="otlCalPrev" aria-label="Previous month">←</button>
           <button type="button" id="otlCalToday">Today</button>
           <button type="button" id="otlCalNext" aria-label="Next month">→</button>
         </div>
       </div>
-      <div class="otl-cal-dows" aria-hidden="true">
-        <div class="otl-cal-dow">Mon</div><div class="otl-cal-dow">Tue</div><div class="otl-cal-dow">Wed</div><div class="otl-cal-dow">Thu</div>
-        <div class="otl-cal-dow">Fri</div><div class="otl-cal-dow">Sat</div><div class="otl-cal-dow">Sun</div>
-      </div>
-      <div class="otl-cal-grid" id="otlCalGrid" role="grid" aria-label="Hours by day"></div>
-      <div class="otl-cal-legend">
-        <span><i></i> Has work hours</span>
-        <span><i class="rest"></i> Rest / no OJT</span>
+      <div id="otlCalBody">
+        <div class="otl-cal-dows" aria-hidden="true">
+          <div class="otl-cal-dow">Mon</div><div class="otl-cal-dow">Tue</div><div class="otl-cal-dow">Wed</div><div class="otl-cal-dow">Thu</div>
+          <div class="otl-cal-dow">Fri</div><div class="otl-cal-dow">Sat</div><div class="otl-cal-dow">Sun</div>
+        </div>
+        <div class="otl-cal-grid" id="otlCalGrid" role="grid" aria-label="Hours by day"></div>
+        <div class="otl-cal-legend">
+          <span><i></i> Has work hours</span>
+          <span><i class="rest"></i> Rest / no OJT</span>
+        </div>
       </div>
     </div>
 
@@ -579,6 +594,7 @@
       <div class="progress-track">
         <div class="progress-fill" id="progressFill" style="width:0%"></div>
       </div>
+      <p id="dailyGoalLine" style="margin-top:8px;font-size:12px;color:var(--text-muted)"></p>
       <!-- Pace alert (shown when end date is set) -->
       <div class="pace-alert neutral" id="paceAlert" style="display:none">
         <span class="pace-icon">ℹ️</span>
@@ -621,7 +637,13 @@
     </div>
 
     <!-- LOG TABLE -->
-    <div class="section-title">Log</div>
+    <div class="section-title" style="margin-bottom:8px">Log</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
+      <button type="button" class="btn btn-ghost" data-log-filter="all" onclick="setLogFilter('all')">All</button>
+      <button type="button" class="btn btn-ghost" data-log-filter="week" onclick="setLogFilter('week')">This week</button>
+      <button type="button" class="btn btn-ghost" data-log-filter="month" onclick="setLogFilter('month')">This month</button>
+      <button type="button" class="btn btn-ghost" data-log-filter="rest" onclick="setLogFilter('rest')">Rest days</button>
+    </div>
     <div class="card" style="padding:0;overflow:visible">
       <div class="toolbar">
         <div class="toolbar-left">
@@ -631,6 +653,7 @@
           <button type="button" class="btn btn-ghost" onclick="printDTRReport()" title="Print or save as PDF">🖨 Print</button>
           <button type="button" class="btn btn-ghost" onclick="exportCSV()" title="Export CSV">↓ CSV</button>
           <button type="button" class="btn btn-ghost" onclick="exportJSON()" title="Export Backup">💾 Backup</button>
+          <!-- <button type="button" class="btn btn-ghost" onclick="copySummary()" title="Copy text summary for reports">📝 Copy summary</button> -->
           <button type="button" class="btn btn-ghost" onclick="triggerImport()" title="Restore from Backup">📂 Restore</button>
           <input type="file" id="importFile" style="display:none" accept="*/*" onchange="importFile(event)" />
         </div>
@@ -1004,6 +1027,7 @@
     const KEY_PROFILE = 'ojt_profile';
     const KEY_LAST_BACKUP = 'ojt_last_backup_ts';
     const KEY_INSTALL_TIP = 'ojt_install_tip_ok';
+    const KEY_CAL_HIDDEN = 'ojt_calendar_hidden';
 
     function newEntryId() {
       if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
@@ -1018,11 +1042,13 @@
       if (!raw) return null;
       const p = JSON.parse(raw);
       const bh = parseFloat(p.breakHours);
+      const dg = parseFloat(p.dailyGoal);
       return {
         name: p.name || '',
         hours: Math.max(1, parseInt(p.hours, 10) || 486),
         endDate: typeof p.endDate === 'string' ? p.endDate : '',
         breakHours: !isNaN(bh) && bh >= 0 && bh <= 12 ? bh : 1,
+        dailyGoal: !isNaN(dg) && dg >= 0 && dg <= 24 ? dg : 6,
       };
     }
     function saveProfileData(p) {
@@ -1153,6 +1179,16 @@
       }).join('');
     }
 
+    function applyCalendarVisibility() {
+      const body = document.getElementById('otlCalBody');
+      const toggle = document.getElementById('otlCalToggle');
+      if (!body || !toggle) return;
+      const hidden = localStorage.getItem(KEY_CAL_HIDDEN) === '1';
+      body.style.display = hidden ? 'none' : '';
+      toggle.textContent = hidden ? 'Show' : 'Hide';
+      toggle.setAttribute('aria-expanded', hidden ? 'false' : 'true');
+    }
+
     function updateBackupReminderUI() {
       const el = document.getElementById('backupReminder');
       if (!el) return;
@@ -1189,6 +1225,15 @@
       localStorage.setItem(KEY_INSTALL_TIP, '1');
       const el = document.getElementById('installTip');
       if (el) el.classList.remove('show');
+    }
+
+    let logFilter = 'all';
+    function setLogFilter(val) {
+      logFilter = val;
+      document.querySelectorAll('[data-log-filter]').forEach(b => {
+        b.classList.toggle('active', b.dataset.logFilter === val);
+      });
+      render();
     }
 
     function syncRestDayForm() {
@@ -1299,6 +1344,7 @@
       const errEl   = document.getElementById('setupError');
       const endDate = document.getElementById('setupEndDate').value.trim();
       const br = parseFloat(document.getElementById('setupBreakHours').value);
+      const dg = parseFloat(document.getElementById('setupDailyGoal').value);
 
       if (!name || !hours || hours < 1) {
         errEl.classList.add('show');
@@ -1310,6 +1356,7 @@
         hours,
         endDate: endDate || '',
         breakHours: !isNaN(br) && br >= 0 && br <= 12 ? br : 1,
+        dailyGoal: !isNaN(dg) && dg >= 0 && dg <= 24 ? dg : 6,
       });
       document.getElementById('setupScreen').classList.remove('show');
       document.getElementById('mainApp').style.display = 'block';
@@ -1327,6 +1374,7 @@
       document.getElementById('profileModalHours').value = p.hours;
       document.getElementById('profileEndDate').value = p.endDate || '';
       document.getElementById('profileBreakHours').value = p.breakHours;
+      document.getElementById('profileDailyGoal').value = p.dailyGoal != null ? p.dailyGoal : 6;
       document.getElementById('profileModalError').classList.remove('visible');
       initThemeControls();
       syncThemePickerUI(getStoredAccent());
@@ -1341,6 +1389,7 @@
       errEl.classList.remove('visible');
       const endDate = document.getElementById('profileEndDate').value.trim();
       const br = parseFloat(document.getElementById('profileBreakHours').value);
+      const dg = parseFloat(document.getElementById('profileDailyGoal').value);
       const prev = loadProfile() || {};
       saveProfileData({
         ...prev,
@@ -1348,6 +1397,7 @@
         hours,
         endDate: endDate || '',
         breakHours: !isNaN(br) && br >= 0 && br <= 12 ? br : 1,
+        dailyGoal: !isNaN(dg) && dg >= 0 && dg <= 24 ? dg : 6,
       });
       closeModal('profileModal');
       render();
@@ -1504,6 +1554,7 @@
           '</button>';
       }
       grid.innerHTML = html;
+      applyCalendarVisibility();
     }
 
     // ═══════════════════════════════════════════════
@@ -1517,6 +1568,23 @@
 
       let displayEntries = allEntries.slice();
       const search = document.getElementById('logSearch').value.toLowerCase().trim();
+
+      const now = new Date();
+      const mondayThisWeek = getMonday(now);
+      const sundayThisWeek = new Date(mondayThisWeek); sundayThisWeek.setDate(mondayThisWeek.getDate() + 6);
+      const ymNow = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+
+      if (logFilter === 'week') {
+        displayEntries = displayEntries.filter(e => {
+          const d = new Date(e.date + 'T12:00:00');
+          return d >= mondayThisWeek && d <= sundayThisWeek;
+        });
+      } else if (logFilter === 'month') {
+        displayEntries = displayEntries.filter(e => e.date.startsWith(ymNow + '-'));
+      } else if (logFilter === 'rest') {
+        displayEntries = displayEntries.filter(e => e.isRest);
+      }
+
       if (search) {
         displayEntries = displayEntries.filter(e =>
           e.date.includes(search) ||
@@ -1540,6 +1608,25 @@
       document.getElementById('progressFill').style.width = pct + '%';
       document.getElementById('progressFill').className = 'progress-fill' + (pct >= 100 ? ' complete' : '');
 
+      const dailyLine = document.getElementById('dailyGoalLine');
+      if (dailyLine) {
+        const todayKey = new Date().toISOString().slice(0, 10);
+        const todayHours = workList
+          .filter(e => e.date === todayKey)
+          .reduce((s, e) => s + e.hours, 0);
+        const goal = profile ? (profile.dailyGoal != null ? profile.dailyGoal : 6) : 6;
+        if (goal > 0) {
+          const hit = todayHours >= goal;
+          dailyLine.style.color = hit ? 'var(--green)' : 'var(--text-muted)';
+          dailyLine.textContent =
+            `Today: ${todayHours.toFixed(1)}h / ${goal.toFixed(1)}h ` +
+            (hit ? '· goal met 🎉' : '· keep going');
+        } else {
+          dailyLine.style.color = 'var(--text-muted)';
+          dailyLine.textContent = `Today: ${todayHours.toFixed(1)}h logged`;
+        }
+      }
+
       const period = formatPeriodSummary(workList);
       const linesEl = document.getElementById('summaryPeriodLines');
       const weeksEl = document.getElementById('summaryWeeksBlock');
@@ -1551,6 +1638,33 @@
       }
       if (weeksEl) {
         weeksEl.innerHTML = '<div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Recent weeks</div>' + buildWeekBarsHTML(workList);
+      }
+
+      const achEl = document.getElementById('achievementsList');
+      if (achEl) {
+        const pctDone = required ? (total / required) * 100 : 0;
+        const streakSet = new Set(workList.map(e => e.date));
+        const sortedDates = Array.from(streakSet).sort();
+        let bestStreak = 0, curStreak = 0, lastDate = null;
+        sortedDates.forEach(dStr => {
+          const d0 = new Date(dStr + 'T00:00:00');
+          if (lastDate && d0 - lastDate === 86400000) curStreak++;
+          else curStreak = 1;
+          bestStreak = Math.max(bestStreak, curStreak);
+          lastDate = d0;
+        });
+
+        const items = [];
+        if (pctDone >= 50) items.push('🎯 Reached 50% of required hours.');
+        if (total >= 100) items.push('🏅 Logged 100+ total hours.');
+        if (workList.length >= 10) items.push('📆 Logged 10+ work days.');
+        if (bestStreak >= 3) items.push(`🔥 ${bestStreak}-day work streak.`);
+
+        if (!items.length) {
+          achEl.innerHTML = '<li>Log more days to unlock achievements.</li>';
+        } else {
+          achEl.innerHTML = items.slice(0,3).map(t => `<li>${t}</li>`).join('');
+        }
       }
 
       if (profile) {
@@ -1867,6 +1981,11 @@
       otlCalMonth = n.getMonth();
       renderOtlCalendar();
     });
+    document.getElementById('otlCalToggle').addEventListener('click', function () {
+      const hidden = localStorage.getItem(KEY_CAL_HIDDEN) === '1';
+      localStorage.setItem(KEY_CAL_HIDDEN, hidden ? '0' : '1');
+      applyCalendarVisibility();
+    });
     document.getElementById('otlCalGrid').addEventListener('click', function (e) {
       const btn = e.target.closest('[data-cal-date]');
       if (!btn || !btn.dataset.calDate) return;
@@ -2019,6 +2138,46 @@
       a.click();
       recordBackupExport();
       showToast('Backup exported! 💾', 'success');
+    }
+
+    async function copySummary() {
+      const profile = loadProfile();
+      const entries = loadEntries();
+      const work = entries.filter(isWorkEntry);
+      if (!entries.length) { showToast('No entries to summarize.', 'error'); return; }
+
+      const total = work.reduce((s,e)=>s+e.hours,0);
+      const required = profile ? profile.hours : 486;
+      const remaining = Math.max(0, required - total);
+      const restCount = entries.filter(e=>e.isRest).length;
+
+      const dates = work.map(e=>e.date).sort();
+      const first = dates[0];
+      const last = dates[dates.length-1];
+
+      const lines = [
+        `Name: ${profile ? profile.name : ''}`,
+        `Required hours: ${required}`,
+        `Completed hours: ${total.toFixed(1)}`,
+        `Remaining hours: ${remaining.toFixed(1)}`,
+        `Work days logged: ${work.length}`,
+        `Rest / no-OJT days: ${restCount}`,
+        `First work date: ${first || 'N/A'}`,
+        `Most recent work date: ${last || 'N/A'}`,
+      ];
+      const text = lines.join('\\n');
+
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(text);
+          showToast('Summary copied to clipboard.', 'success');
+        } else {
+          window.prompt('Copy this summary:', text);
+        }
+      } catch (e) {
+        console.error(e);
+        window.prompt('Copy this summary:', text);
+      }
     }
 
     function triggerImport() {

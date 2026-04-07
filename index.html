@@ -59,8 +59,6 @@
     .header-left h1 .accent{color:var(--accent)}
     .header-left p{color:var(--text-muted);font-size:13px;margin-top:4px}
     .header-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end;flex-shrink:0;margin-top:4px;max-width:min(100%,280px)}
-    .btn-header-theme{display:inline-flex;align-items:center;gap:5px;background:var(--surface);border:1.5px solid var(--border);border-radius:99px;padding:0 12px;height:40px;font-size:12px;font-weight:600;color:var(--text);cursor:pointer;font-family:var(--font-body);transition:var(--tr);white-space:nowrap}
-    .btn-header-theme:hover{background:var(--surface-2)}
 
     /* ── PROFILE HERO CARD ── */
     .profile-hero{
@@ -296,7 +294,7 @@
       </div>
       <div class="header-actions">
         <button class="toggle-dark" id="qrBtn" onclick="openQRModal()" title="Share QR Code">📱</button>
-        <button type="button" class="btn-header-theme" id="themeStyleBtn" onclick="openThemeStyleModal()" title="Pick theme color">🎨 Theme</button>
+        <button type="button" class="toggle-dark" id="themeStyleBtn" onclick="openThemeStyleModal()" title="Theme colors">🎨</button>
         <button class="toggle-dark" id="darkToggle">🌙</button>
       </div>
     </div>

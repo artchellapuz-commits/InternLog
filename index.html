@@ -192,6 +192,7 @@
     tbody tr:hover{background:var(--surface-2)}
     .hours-badge{display:inline-block;background:var(--green-light);color:var(--green);border-radius:99px;padding:2px 9px;font-size:12px;font-weight:600}
     .td-actions{display:flex;gap:4px;justify-content:flex-end}
+    .td-actions .btn-edit-ghost,.td-actions .btn-danger-ghost{min-width:44px;min-height:44px;align-items:center;justify-content:center;padding:10px}
     .empty-state{text-align:center;padding:40px 20px;color:var(--text-muted)}
     .empty-state .empty-icon{font-size:2.5rem;margin-bottom:10px;opacity:.5}
     .empty-state p{font-size:14px}
@@ -245,6 +246,77 @@
     #qrcode{padding:12px;background:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.05)}
     #qrcode img{display:block}
     .qr-url{font-size:11px;color:var(--text-muted);word-break:break-all;text-align:center;max-width:240px;margin-top:4px}
+
+    .summary-lines{font-size:13px;color:var(--text-muted);line-height:1.5}
+    .summary-lines strong{color:var(--text);font-weight:600}
+    .summary-weeks{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:12px}
+    .summary-weeks-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+    .summary-weeks-bar{flex:1;height:8px;background:var(--surface-2);border-radius:99px;overflow:hidden;border:1px solid var(--border)}
+    .summary-weeks-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-soft));border-radius:99px;max-width:100%}
+
+    /* ── MONTH CALENDAR ── */
+    .otl-cal{margin-bottom:16px}
+    .otl-cal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+    .otl-cal-title{font-family:var(--font-display);font-size:1rem;font-weight:800}
+    .otl-cal-sub{font-size:12px;color:var(--text-muted);margin-top:2px}
+    .otl-cal-nav{display:flex;gap:6px;align-items:center}
+    .otl-cal-nav button{background:var(--surface-2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);color:var(--text);transition:var(--tr)}
+    .otl-cal-nav button:hover{background:var(--surface)}
+    .otl-cal-dows{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px}
+    .otl-cal-dow{text-align:center;font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;padding:4px 0}
+    .otl-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+    button.otl-cal-cell{min-height:48px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface-2);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:4px 2px 6px;font-size:11px;color:var(--text-muted);transition:var(--tr);width:100%;font-family:inherit;-webkit-tap-highlight-color:transparent}
+    .otl-cal-cell.pad{background:transparent;border-color:transparent;min-height:8px;pointer-events:none}
+    .otl-cal-cell.has-work{background:var(--accent-light);border-color:var(--accent);color:var(--text);cursor:pointer}
+    button.otl-cal-cell:not(.has-work):not(.pad):hover{background:var(--surface)}
+    .otl-cal-cell.has-work:hover{filter:brightness(0.97);transform:scale(1.02)}
+    .otl-cal-cell.has-rest{border-style:dashed;border-color:var(--blue)}
+    .otl-cal-cell.today{box-shadow:0 0 0 2px var(--accent)}
+    .otl-cal-daynum{font-family:var(--font-display);font-size:13px;font-weight:800;line-height:1.1}
+    .otl-cal-hrs{font-size:10px;font-weight:600;color:var(--accent-dark);margin-top:2px}
+    .otl-cal-rest{font-size:9px;color:var(--blue);font-weight:600;margin-top:1px}
+    .otl-cal-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;font-size:11px;color:var(--text-muted)}
+    .otl-cal-legend span{display:inline-flex;align-items:center;gap:6px}
+    .otl-cal-legend i{width:12px;height:12px;border-radius:3px;background:var(--accent-light);border:1.5px solid var(--accent)}
+    .otl-cal-legend i.rest{background:var(--blue-light);border-style:dashed;border-color:var(--blue)}
+    .day-detail-list{font-size:13px;line-height:1.45;margin:12px 0;max-height:220px;overflow-y:auto}
+    .day-detail-row{padding:8px 0;border-bottom:1px solid var(--border)}
+    .day-detail-row:last-child{border-bottom:none}
+
+    .setup-privacy{font-size:12px;color:var(--text-muted);line-height:1.45;margin-bottom:20px;padding:12px;background:var(--surface-2);border-radius:var(--radius-sm);border:1px solid var(--border)}
+    .checkbox-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;cursor:pointer;font-size:14px;font-weight:500}
+    .checkbox-row input{width:18px;height:18px;accent-color:var(--accent);flex-shrink:0}
+    .rest-hint{font-size:12px;color:var(--text-muted);margin:-6px 0 10px 28px;display:none}
+    .rest-hint.show{display:block}
+    tr.row-rest td{font-style:italic;opacity:.92}
+    .hours-badge.rest{background:var(--blue-light);color:var(--blue)}
+    .backup-banner{display:none;align-items:flex-start;justify-content:space-between;gap:12px;background:var(--warn-light);border:1.5px solid var(--warn);color:var(--warn);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:14px;font-size:13px}
+    .backup-banner.show{display:flex;flex-wrap:wrap}
+    .backup-banner button{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:6px 12px;font-weight:600;cursor:pointer;font-size:12px}
+    .install-tip{display:none;margin-bottom:14px;background:var(--blue-light);border:1.5px solid var(--blue);color:var(--blue);border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;align-items:flex-start;gap:12px}
+    .install-tip.show{display:flex}
+    .install-tip p{flex:1;line-height:1.45}
+    .install-tip button{flex-shrink:0;background:var(--surface);border:1.5px solid var(--blue);border-radius:var(--radius-sm);padding:6px 10px;font-weight:600;cursor:pointer;font-size:12px;color:var(--blue)}
+    .undo-bar{display:none;position:fixed;bottom:calc(16px + var(--sab));left:50%;transform:translateX(-50%);z-index:950;background:var(--text);color:var(--bg);padding:12px 18px;border-radius:12px;box-shadow:var(--shadow-lg);align-items:center;gap:14px;max-width:min(420px,calc(100% - 32px));font-size:14px}
+    .undo-bar.show{display:flex}
+    .undo-bar button{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:700;cursor:pointer;font-size:13px}
+    #printRoot{position:absolute;left:-9999px;top:0;width:210mm}
+    @media print{
+      body *{visibility:hidden}
+      #printRoot,#printRoot *{visibility:visible}
+      #printRoot{position:absolute;left:0;top:0;width:100%}
+    }
+    #printReportInner{padding:16mm;font-family:var(--font-body);color:#111;font-size:11pt}
+    #printReportInner h1{font-family:var(--font-display);font-size:18pt;margin-bottom:4px}
+    #printReportInner .meta{margin-bottom:14px;color:#444;font-size:10pt}
+    #printReportInner table{width:100%;border-collapse:collapse;font-size:10pt}
+    #printReportInner th,#printReportInner td{border:1px solid #ccc;padding:6px 8px;text-align:left}
+    #printReportInner th{background:#f0f0f0}
+
+    @media (prefers-reduced-motion: reduce){
+      *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+      .toast{animation:none}
+    }
 
     /* ── Small phones (≤400px: iPhone SE, 6/7/8, narrow Android) ── */
     @media (max-width:400px){
@@ -329,6 +401,7 @@
       .setup-logo{font-size:1.65rem}
       .toast{max-width:calc(100vw - 32px);white-space:normal;text-align:center;line-height:1.35;padding:10px 16px}
       .empty-state{padding:28px 14px}
+      button.otl-cal-cell{min-height:44px}
     }
 
     @media (max-width:360px){
@@ -347,6 +420,7 @@
     <div class="setup-inner">
       <div class="setup-logo">Intern<span>Log</span></div>
       <p class="setup-desc">Let's set up your internship profile before we start tracking.</p>
+      <p class="setup-privacy" role="note">Your hours and profile stay on this device only. Use <strong>Backup</strong> in the log to save a file you can store elsewhere. Clearing browser data will remove everything.</p>
 
       <!-- Name -->
       <div class="setup-field">
@@ -359,6 +433,18 @@
         <label>Required OJT Hours</label>
         <input type="number" id="setupHours" placeholder="e.g. 486" min="1" max="9999" value="486" />
         <div class="setup-hint">Total hours you need to complete (default is 486).</div>
+      </div>
+
+      <div class="setup-field">
+        <label>Target end date <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted)">(optional)</span></label>
+        <input type="date" id="setupEndDate" />
+        <div class="setup-hint">School or company deadline — used for pace hints alongside your hour target.</div>
+      </div>
+
+      <div class="setup-field">
+        <label>Break deduction (hours)</label>
+        <input type="number" id="setupBreakHours" value="1" min="0" max="12" step="0.25" />
+        <div class="setup-hint">Subtracted from each day when time out − time in is longer than this (e.g. lunch).</div>
       </div>
 
       <p class="setup-error" id="setupError">Please fill in all fields correctly.</p>
@@ -387,9 +473,9 @@
         <p id="headerSub">Track your internship progress</p>
       </div>
       <div class="header-actions">
-        <button class="toggle-dark" id="qrBtn" onclick="openQRModal()" title="Share QR Code">📱</button>
-        <button type="button" class="toggle-dark" id="themeStyleBtn" onclick="openThemeStyleModal()" title="Theme colors">🎨</button>
-        <button class="toggle-dark" id="darkToggle">🌙</button>
+        <button type="button" class="toggle-dark" id="qrBtn" onclick="openQRModal()" title="Share QR Code" aria-label="Share QR code">📱</button>
+        <button type="button" class="toggle-dark" id="themeStyleBtn" onclick="openThemeStyleModal()" title="Theme colors" aria-label="Theme colors">🎨</button>
+        <button type="button" class="toggle-dark" id="darkToggle" aria-label="Toggle dark mode">🌙</button>
       </div>
     </div>
 
@@ -423,6 +509,19 @@
       </div>
     </div>
 
+    <div id="installTip" class="install-tip" role="status">
+      <p><strong>Tip:</strong> Add InternLog to your Home Screen for quick access. After the first visit, it works offline thanks to your browser cache.</p>
+      <button type="button" onclick="dismissInstallTip()">OK</button>
+    </div>
+
+    <div id="backupReminder" class="backup-banner" role="status">
+      <span>You have not downloaded a JSON backup in over a week. Export now to avoid losing data if you clear your browser.</span>
+      <span style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" onclick="exportJSON()">Backup</button>
+        <button type="button" onclick="dismissBackupReminder()">Later</button>
+      </span>
+    </div>
+
     <!-- STATS -->
     <div class="stats-grid">
       <div class="stat-card highlight">
@@ -436,9 +535,38 @@
         <div class="stat-sub">hours</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Days</div>
+        <div class="stat-label">Work days</div>
         <div class="stat-value" id="statDays">0</div>
-        <div class="stat-sub">logged</div>
+        <div class="stat-sub">with hours</div>
+      </div>
+    </div>
+
+    <div class="card" id="summaryPeriodCard">
+      <div class="section-title" style="margin-bottom:10px">Period summary</div>
+      <div class="summary-lines" id="summaryPeriodLines"></div>
+      <div class="summary-weeks" id="summaryWeeksBlock"></div>
+    </div>
+
+    <div class="card otl-cal" id="otlCalendarCard">
+      <div class="otl-cal-head">
+        <div>
+          <div class="otl-cal-title" id="otlCalMonthTitle">Month</div>
+          <div class="otl-cal-sub" id="otlCalMonthStat">0.0 hours this month · tap a day for details</div>
+        </div>
+        <div class="otl-cal-nav">
+          <button type="button" id="otlCalPrev" aria-label="Previous month">←</button>
+          <button type="button" id="otlCalToday">Today</button>
+          <button type="button" id="otlCalNext" aria-label="Next month">→</button>
+        </div>
+      </div>
+      <div class="otl-cal-dows" aria-hidden="true">
+        <div class="otl-cal-dow">Mon</div><div class="otl-cal-dow">Tue</div><div class="otl-cal-dow">Wed</div><div class="otl-cal-dow">Thu</div>
+        <div class="otl-cal-dow">Fri</div><div class="otl-cal-dow">Sat</div><div class="otl-cal-dow">Sun</div>
+      </div>
+      <div class="otl-cal-grid" id="otlCalGrid" role="grid" aria-label="Hours by day"></div>
+      <div class="otl-cal-legend">
+        <span><i></i> Has work hours</span>
+        <span><i class="rest"></i> Rest / no OJT</span>
       </div>
     </div>
 
@@ -479,6 +607,11 @@
           <input type="time" id="inputTimeOut" value="17:00" />
         </div>
       </div>
+      <label class="checkbox-row">
+        <input type="checkbox" id="inputRestDay" onchange="syncRestDayForm()" />
+        <span>Rest day / no OJT (no hours; optional note only)</span>
+      </label>
+      <p class="rest-hint" id="restDayHint">Time fields are ignored. Add a note if you want (e.g. holiday).</p>
       <div class="form-group" style="margin-bottom:12px">
         <label for="inputNotes">Notes / Remarks <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted)">(optional)</span></label>
         <textarea id="inputNotes" class="form-notes" rows="2" placeholder="e.g. Worked on inventory system, attended standup..."></textarea>
@@ -495,9 +628,10 @@
           <input type="text" class="search-input" id="logSearch" placeholder="Search by date or notes..." oninput="render()" />
         </div>
         <div class="toolbar-right">
-          <button class="btn btn-ghost" onclick="exportCSV()" title="Export CSV">↓ CSV</button>
-          <button class="btn btn-ghost" onclick="exportJSON()" title="Export Backup">💾 Backup</button>
-          <button class="btn btn-ghost" onclick="triggerImport()" title="Restore from Backup">📂 Restore</button>
+          <button type="button" class="btn btn-ghost" onclick="printDTRReport()" title="Print or save as PDF">🖨 Print</button>
+          <button type="button" class="btn btn-ghost" onclick="exportCSV()" title="Export CSV">↓ CSV</button>
+          <button type="button" class="btn btn-ghost" onclick="exportJSON()" title="Export Backup">💾 Backup</button>
+          <button type="button" class="btn btn-ghost" onclick="triggerImport()" title="Restore from Backup">📂 Restore</button>
           <input type="file" id="importFile" style="display:none" accept="*/*" onchange="importFile(event)" />
         </div>
       </div>
@@ -506,6 +640,13 @@
 
   </div><!-- end .app-wrapper -->
 
+  <div id="undoBar" class="undo-bar" role="status" aria-live="polite">
+    <span>Entry deleted.</span>
+    <button type="button" onclick="undoLastDelete()">Undo</button>
+  </div>
+
+  <div id="printRoot" aria-hidden="true"><div id="printReportInner"></div></div>
+
   <!-- ══════════════════════════════════════
        EDIT ENTRY MODAL
   ══════════════════════════════════════ -->
@@ -513,6 +654,10 @@
     <div class="modal">
       <h2>✏️ Edit Entry</h2>
       <input type="hidden" id="editIndex" />
+      <label class="checkbox-row" style="margin-bottom:12px">
+        <input type="checkbox" id="editIsRest" onchange="syncEditRestForm()" />
+        <span>Rest day / no OJT</span>
+      </label>
       <div class="form-grid" style="grid-template-columns:1fr;gap:12px">
         <div class="form-group"><label>Date</label><input type="date" id="editDate" /></div>
         <div class="form-group"><label>Time In</label><input type="time" id="editTimeIn" /></div>
@@ -546,6 +691,14 @@
         <div class="form-group">
           <label>Required OJT Hours</label>
           <input type="number" id="profileModalHours" placeholder="e.g. 486" min="1" max="9999" />
+        </div>
+        <div class="form-group">
+          <label>Target end date <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted)">(optional)</span></label>
+          <input type="date" id="profileEndDate" />
+        </div>
+        <div class="form-group">
+          <label>Break deduction (hours)</label>
+          <input type="number" id="profileBreakHours" min="0" max="12" step="0.25" />
         </div>
       </div>
 
@@ -588,6 +741,21 @@
       </div>
       <div class="modal-actions">
         <button class="btn btn-primary" style="background:var(--accent)" onclick="closeModal('themeStyleModal')">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       CALENDAR DAY DETAIL MODAL
+  ══════════════════════════════════════ -->
+  <div class="modal-overlay" id="calendarDayModal">
+    <div class="modal" style="max-width:400px">
+      <h2 id="calendarDayModalTitle">Day</h2>
+      <p class="modal-desc" id="calendarDayModalSub"></p>
+      <div class="day-detail-list" id="calendarDayModalBody"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('calendarDayModal')">Close</button>
+        <button type="button" class="btn btn-primary" style="background:var(--accent)" id="calendarDayAddBtn">Add entry on this date</button>
       </div>
     </div>
   </div>
@@ -834,34 +1002,250 @@
     // ═══════════════════════════════════════════════
     const KEY_ENTRIES = 'ojt_entries';
     const KEY_PROFILE = 'ojt_profile';
-    const BREAK_HOURS = 1;
+    const KEY_LAST_BACKUP = 'ojt_last_backup_ts';
+    const KEY_INSTALL_TIP = 'ojt_install_tip_ok';
+
+    function newEntryId() {
+      if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+      return 'e_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
+    }
 
     // ═══════════════════════════════════════════════
     // PROFILE helpers
     // ═══════════════════════════════════════════════
     function loadProfile() {
       const raw = localStorage.getItem(KEY_PROFILE);
-      return raw ? JSON.parse(raw) : null;
+      if (!raw) return null;
+      const p = JSON.parse(raw);
+      const bh = parseFloat(p.breakHours);
+      return {
+        name: p.name || '',
+        hours: Math.max(1, parseInt(p.hours, 10) || 486),
+        endDate: typeof p.endDate === 'string' ? p.endDate : '',
+        breakHours: !isNaN(bh) && bh >= 0 && bh <= 12 ? bh : 1,
+      };
     }
     function saveProfileData(p) {
       localStorage.setItem(KEY_PROFILE, JSON.stringify(p));
+      markDataChanged();
+    }
+
+    function markDataChanged() {
+      localStorage.setItem('ojt_data_changed', '1');
+    }
+
+    function recordBackupExport() {
+      localStorage.setItem(KEY_LAST_BACKUP, String(Date.now()));
+      localStorage.removeItem('ojt_data_changed');
+      updateBackupReminderUI();
     }
 
     // ═══════════════════════════════════════════════
     // ENTRIES helpers
     // ═══════════════════════════════════════════════
-    const loadEntries = () => {
-      const entries = JSON.parse(localStorage.getItem(KEY_ENTRIES)||'[]');
-      // Sort entries by date (newest first). Change to a.date.localeCompare(b.date) for oldest first.
+    function loadEntries() {
+      let entries = JSON.parse(localStorage.getItem(KEY_ENTRIES) || '[]');
+      let changed = false;
+      entries.forEach(e => {
+        if (!e.id) {
+          e.id = newEntryId();
+          changed = true;
+        }
+      });
+      if (changed) localStorage.setItem(KEY_ENTRIES, JSON.stringify(entries));
       return entries.sort((a, b) => new Date(b.date) - new Date(a.date));
-    };
-    const saveEntries = e  => localStorage.setItem(KEY_ENTRIES, JSON.stringify(e));
+    }
+    function saveEntries(e) {
+      localStorage.setItem(KEY_ENTRIES, JSON.stringify(e));
+      markDataChanged();
+    }
+
+    function isWorkEntry(e) {
+      return e && !e.isRest;
+    }
+
+    function getBreakHours() {
+      const p = loadProfile();
+      return p ? p.breakHours : 1;
+    }
 
     // ═══════════════════════════════════════════════
     // HELPERS
     // ═══════════════════════════════════════════════
-    const toMins  = t => { const[h,m]=t.split(':').map(Number); return h*60+m; };
-    const calcHrs = (i,o) => { const r=(toMins(o)-toMins(i))/60; return Math.round((r>BREAK_HOURS?r-BREAK_HOURS:r)*100)/100; };
+    const toMins = t => {
+      if (!t || t === '—') return 0;
+      const parts = String(t).split(':');
+      const h = +parts[0], m = +parts[1];
+      if (isNaN(h) || isNaN(m)) return 0;
+      return h * 60 + m;
+    };
+    const calcHrs = (i, o, brk) => {
+      const b = brk != null ? brk : getBreakHours();
+      const r = (toMins(o) - toMins(i)) / 60;
+      return Math.round((r > b ? r - b : r) * 100) / 100;
+    };
+
+    function timeRangesOverlap(a1, a2, b1, b2) {
+      return Math.max(a1, b1) < Math.min(a2, b2);
+    }
+
+    function entryOverlapsSameDay(entries, date, timeIn, timeOut, excludeId) {
+      const i1 = toMins(timeIn), o1 = toMins(timeOut);
+      return entries.filter(isWorkEntry).some(e => {
+        if (e.date !== date) return false;
+        if (excludeId && e.id === excludeId) return false;
+        return timeRangesOverlap(i1, o1, toMins(e.timeIn), toMins(e.timeOut));
+      });
+    }
+
+    function escapeHtml(s) {
+      return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function getMonday(d) {
+      const x = new Date(d.getTime());
+      const day = x.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      x.setDate(x.getDate() + diff);
+      x.setHours(0, 0, 0, 0);
+      return x;
+    }
+
+    function formatPeriodSummary(workEntries) {
+      const now = new Date();
+      const y = now.getFullYear(), m = now.getMonth();
+      const monthStart = new Date(y, m, 1);
+      const monthEnd = new Date(y, m + 1, 0, 23, 59, 59, 999);
+      const day = now.getDay();
+      const mondayOffset = day === 0 ? -6 : 1 - day;
+      const weekStart = new Date(now);
+      weekStart.setDate(now.getDate() + mondayOffset);
+      weekStart.setHours(0, 0, 0, 0);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+      weekEnd.setHours(23, 59, 59, 999);
+      let monthHrs = 0, weekHrs = 0;
+      workEntries.forEach(e => {
+        const dt = new Date(e.date + 'T12:00:00');
+        if (dt >= monthStart && dt <= monthEnd) monthHrs += e.hours;
+        if (dt >= weekStart && dt <= weekEnd) weekHrs += e.hours;
+      });
+      return { weekHrs, monthHrs, weekStart, weekEnd };
+    }
+
+    function buildWeekBarsHTML(workEntries) {
+      const byWeek = {};
+      let maxH = 0;
+      workEntries.forEach(e => {
+        const ws = getMonday(new Date(e.date + 'T12:00:00'));
+        const key = ws.toISOString().slice(0, 10);
+        byWeek[key] = (byWeek[key] || 0) + e.hours;
+        maxH = Math.max(maxH, byWeek[key]);
+      });
+      const keys = Object.keys(byWeek).sort().reverse().slice(0, 4);
+      if (!keys.length) return '<p style="font-size:12px;color:var(--text-muted)">Log work hours to see weekly bars.</p>';
+      if (maxH < 0.01) maxH = 1;
+      return keys.map(k => {
+        const hrs = byWeek[k];
+        const pct = Math.min(100, (hrs / maxH) * 100);
+        const label = new Date(k + 'T12:00:00').toLocaleDateString('en-PH', { month: 'short', day: 'numeric' });
+        return '<div class="summary-weeks-row"><span style="min-width:72px;font-size:11px;color:var(--text-muted)">Week ' + label + '</span><div class="summary-weeks-bar"><div class="summary-weeks-fill" style="width:' + pct + '%"></div></div><strong style="font-size:11px;min-width:40px;text-align:right">' + hrs.toFixed(1) + 'h</strong></div>';
+      }).join('');
+    }
+
+    function updateBackupReminderUI() {
+      const el = document.getElementById('backupReminder');
+      if (!el) return;
+      const entries = JSON.parse(localStorage.getItem(KEY_ENTRIES) || '[]');
+      if (!entries.length) {
+        el.classList.remove('show');
+        return;
+      }
+      const last = parseInt(localStorage.getItem(KEY_LAST_BACKUP) || '0', 10);
+      const week = 7 * 86400000;
+      const needRemind = !last || Date.now() - last > week;
+      if (needRemind && !sessionStorage.getItem('ojt_backup_remind_dismissed')) el.classList.add('show');
+      else el.classList.remove('show');
+    }
+
+    function dismissBackupReminder() {
+      sessionStorage.setItem('ojt_backup_remind_dismissed', '1');
+      const el = document.getElementById('backupReminder');
+      if (el) el.classList.remove('show');
+    }
+
+    function maybeShowInstallTip() {
+      const el = document.getElementById('installTip');
+      if (!el) return;
+      const standalone = window.matchMedia('(display-mode:standalone)').matches || window.navigator.standalone === true;
+      if (standalone || localStorage.getItem(KEY_INSTALL_TIP)) {
+        el.classList.remove('show');
+        return;
+      }
+      el.classList.add('show');
+    }
+
+    function dismissInstallTip() {
+      localStorage.setItem(KEY_INSTALL_TIP, '1');
+      const el = document.getElementById('installTip');
+      if (el) el.classList.remove('show');
+    }
+
+    function syncRestDayForm() {
+      const rest = document.getElementById('inputRestDay').checked;
+      document.getElementById('inputTimeIn').disabled = rest;
+      document.getElementById('inputTimeOut').disabled = rest;
+      document.getElementById('restDayHint').classList.toggle('show', rest);
+    }
+
+    function syncEditRestForm() {
+      const rest = document.getElementById('editIsRest').checked;
+      document.getElementById('editTimeIn').disabled = rest;
+      document.getElementById('editTimeOut').disabled = rest;
+    }
+
+    let undoDeletePayload = null;
+    let undoDeleteTimer = null;
+
+    function showUndoBar(entrySnapshot) {
+      const bar = document.getElementById('undoBar');
+      if (!bar) return;
+      undoDeletePayload = entrySnapshot;
+      clearTimeout(undoDeleteTimer);
+      bar.classList.add('show');
+      undoDeleteTimer = setTimeout(function () {
+        bar.classList.remove('show');
+        undoDeletePayload = null;
+      }, 8000);
+    }
+
+    function undoLastDelete() {
+      if (!undoDeletePayload) return;
+      const list = loadEntries();
+      list.push(undoDeletePayload);
+      saveEntries(list);
+      undoDeletePayload = null;
+      clearTimeout(undoDeleteTimer);
+      document.getElementById('undoBar').classList.remove('show');
+      render();
+      showToast('Entry restored', 'success');
+    }
+
+    function printDTRReport() {
+      const profile = loadProfile();
+      const entries = loadEntries().filter(isWorkEntry).slice().sort((a, b) => a.date.localeCompare(b.date));
+      if (!entries.length) {
+        showToast('No work entries to print.', 'error');
+        return;
+      }
+      const inner = document.getElementById('printReportInner');
+      const name = profile ? profile.name : '';
+      const req = profile ? profile.hours : '';
+      inner.innerHTML = '<h1>OJT hours — ' + escapeHtml(name) + '</h1><div class="meta">Required hours: ' + escapeHtml(String(req)) + ' · Printed ' + new Date().toLocaleString() + '</div><table><thead><tr><th>Date</th><th>Time in</th><th>Time out</th><th>Hours</th><th>Notes</th></tr></thead><tbody>' +
+        entries.map(e => '<tr><td>' + escapeHtml(e.date) + '</td><td>' + escapeHtml(e.timeIn) + '</td><td>' + escapeHtml(e.timeOut) + '</td><td>' + e.hours.toFixed(2) + '</td><td>' + escapeHtml(e.notes || '') + '</td></tr>').join('') +
+        '</tbody></table>';
+      window.print();
+    }
     const fmtDate = s => new Date(s+'T00:00:00').toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'});
     const fmtTime = t => { const[h,m]=t.split(':').map(Number); return `${h%12||12}:${String(m).padStart(2,'0')} ${h>=12?'PM':'AM'}`; };
     const today0  = () => { const d=new Date(); d.setHours(0,0,0,0); return d; };
@@ -913,13 +1297,20 @@
       const name    = document.getElementById('setupName').value.trim();
       const hours   = parseInt(document.getElementById('setupHours').value);
       const errEl   = document.getElementById('setupError');
+      const endDate = document.getElementById('setupEndDate').value.trim();
+      const br = parseFloat(document.getElementById('setupBreakHours').value);
 
       if (!name || !hours || hours < 1) {
         errEl.classList.add('show');
         return;
       }
       errEl.classList.remove('show');
-      saveProfileData({ name, hours });
+      saveProfileData({
+        name,
+        hours,
+        endDate: endDate || '',
+        breakHours: !isNaN(br) && br >= 0 && br <= 12 ? br : 1,
+      });
       document.getElementById('setupScreen').classList.remove('show');
       document.getElementById('mainApp').style.display = 'block';
       render();
@@ -932,8 +1323,10 @@
     function openProfileModal() {
       const p = loadProfile();
       if (!p) return;
-      document.getElementById('profileModalName').value    = p.name;
-      document.getElementById('profileModalHours').value   = p.hours;
+      document.getElementById('profileModalName').value = p.name;
+      document.getElementById('profileModalHours').value = p.hours;
+      document.getElementById('profileEndDate').value = p.endDate || '';
+      document.getElementById('profileBreakHours').value = p.breakHours;
       document.getElementById('profileModalError').classList.remove('visible');
       initThemeControls();
       syncThemePickerUI(getStoredAccent());
@@ -941,12 +1334,21 @@
     }
 
     function saveProfileModal() {
-      const name    = document.getElementById('profileModalName').value.trim();
-      const hours   = parseInt(document.getElementById('profileModalHours').value);
-      const errEl   = document.getElementById('profileModalError');
+      const name = document.getElementById('profileModalName').value.trim();
+      const hours = parseInt(document.getElementById('profileModalHours').value);
+      const errEl = document.getElementById('profileModalError');
       if (!name || !hours || hours < 1) { errEl.classList.add('visible'); return; }
       errEl.classList.remove('visible');
-      saveProfileData({ name, hours });
+      const endDate = document.getElementById('profileEndDate').value.trim();
+      const br = parseFloat(document.getElementById('profileBreakHours').value);
+      const prev = loadProfile() || {};
+      saveProfileData({
+        ...prev,
+        name,
+        hours,
+        endDate: endDate || '',
+        breakHours: !isNaN(br) && br >= 0 && br <= 12 ? br : 1,
+      });
       closeModal('profileModal');
       render();
       showToast('Profile updated ✅', 'success');
@@ -957,154 +1359,356 @@
       localStorage.removeItem(KEY_ENTRIES);
       localStorage.removeItem(KEY_PROFILE);
       localStorage.removeItem(KEY_ACCENT);
+      localStorage.removeItem(KEY_LAST_BACKUP);
+      localStorage.removeItem('ojt_data_changed');
+      localStorage.removeItem(KEY_INSTALL_TIP);
+      sessionStorage.removeItem('ojt_backup_remind_dismissed');
       persistAccent(DEFAULT_ACCENT);
       closeModal('profileModal');
       showSetup();
+    }
+
+    let otlCalYear = null;
+    let otlCalMonth = null;
+
+    function ensureOtlCalMonth() {
+      if (otlCalYear == null) {
+        const n = new Date();
+        otlCalYear = n.getFullYear();
+        otlCalMonth = n.getMonth();
+      }
+    }
+
+    function padYmdParts(y, monthIndex, day) {
+      return y + '-' + String(monthIndex + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+    }
+
+    function mondayPadFirstOfMonth(y, m) {
+      const wd = new Date(y, m, 1).getDay();
+      return wd === 0 ? 6 : wd - 1;
+    }
+
+    function rollupByDate(entries) {
+      const map = {};
+      entries.forEach(e => {
+        if (!map[e.date]) map[e.date] = { hrs: 0, rest: false };
+        if (e.isRest) map[e.date].rest = true;
+        else map[e.date].hrs += e.hours;
+      });
+      return map;
+    }
+
+    function entriesForDate(entries, dateStr) {
+      return entries.filter(e => e.date === dateStr);
+    }
+
+    function openCalendarDayModal(dateStr) {
+      const list = entriesForDate(loadEntries(), dateStr);
+      document.getElementById('calendarDayModalTitle').textContent = fmtDate(dateStr);
+      const sub = document.getElementById('calendarDayModalSub');
+      const body = document.getElementById('calendarDayModalBody');
+      const totalWork = list.filter(isWorkEntry).reduce((s, e) => s + e.hours, 0);
+      sub.textContent =
+        list.length === 0
+          ? 'No entries on this day.'
+          : 'Total work hours that day: ' + totalWork.toFixed(1) + 'h · ' + list.length + ' row(s).';
+      if (!list.length) {
+        body.innerHTML = '<p style="color:var(--text-muted);font-size:13px">Use “Add entry on this date” to log hours or a rest day.</p>';
+      } else {
+        body.innerHTML = list
+          .map(e => {
+            if (e.isRest) {
+              return (
+                '<div class="day-detail-row"><strong>Rest / no OJT</strong><br/><span style="color:var(--text-muted);font-size:12px">' +
+                escapeHtml(e.notes || '') +
+                '</span></div>'
+              );
+            }
+            return (
+              '<div class="day-detail-row"><strong>' +
+              fmtTime(e.timeIn) +
+              ' – ' +
+              fmtTime(e.timeOut) +
+              '</strong> · ' +
+              e.hours.toFixed(2) +
+              'h<br/><span style="color:var(--text-muted);font-size:12px">' +
+              escapeHtml(e.notes || '') +
+              '</span></div>'
+            );
+          })
+          .join('');
+      }
+      document.getElementById('calendarDayAddBtn').onclick = function () {
+        document.getElementById('inputDate').value = dateStr;
+        document.getElementById('inputRestDay').checked = false;
+        syncRestDayForm();
+        closeModal('calendarDayModal');
+        document.getElementById('inputDate').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        showToast('Date set in Add Entry below', 'success');
+      };
+      document.getElementById('calendarDayModal').classList.add('open');
+    }
+
+    function renderOtlCalendar() {
+      ensureOtlCalMonth();
+      const y = otlCalYear;
+      const m = otlCalMonth;
+      const entries = loadEntries();
+      const rollup = rollupByDate(entries);
+      const last = new Date(y, m + 1, 0);
+      const daysInMonth = last.getDate();
+      const pad = mondayPadFirstOfMonth(y, m);
+
+      const titleEl = document.getElementById('otlCalMonthTitle');
+      const statEl = document.getElementById('otlCalMonthStat');
+      const grid = document.getElementById('otlCalGrid');
+      if (!titleEl || !grid || !statEl) return;
+
+      titleEl.textContent = new Date(y, m, 1).toLocaleDateString('en-PH', { month: 'long', year: 'numeric' });
+
+      let monthHrs = 0;
+      for (let day = 1; day <= daysInMonth; day++) {
+        const key = padYmdParts(y, m, day);
+        if (rollup[key]) monthHrs += rollup[key].hrs;
+      }
+      statEl.textContent = monthHrs.toFixed(1) + ' hours this month · tap any day for details';
+
+      const t = new Date();
+      const todayStr = padYmdParts(t.getFullYear(), t.getMonth(), t.getDate());
+
+      let html = '';
+      for (let i = 0; i < pad; i++) {
+        html += '<div class="otl-cal-cell pad" aria-hidden="true"></div>';
+      }
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = padYmdParts(y, m, day);
+        const roll = rollup[dateStr];
+        const isToday = dateStr === todayStr;
+        let cls = 'otl-cal-cell';
+        if (roll && roll.hrs > 0) cls += ' has-work';
+        if (roll && roll.rest) cls += ' has-rest';
+        if (isToday) cls += ' today';
+        let inner = '<span class="otl-cal-daynum">' + day + '</span>';
+        if (roll && roll.hrs > 0) inner += '<span class="otl-cal-hrs">' + roll.hrs.toFixed(1) + 'h</span>';
+        if (roll && roll.rest) inner += '<span class="otl-cal-rest">Rest</span>';
+        html +=
+          '<button type="button" class="' +
+          cls +
+          '" data-cal-date="' +
+          dateStr +
+          '" aria-label="' +
+          fmtDate(dateStr) +
+          (roll && roll.hrs ? ', ' + roll.hrs.toFixed(1) + ' hours' : '') +
+          '">' +
+          inner +
+          '</button>';
+      }
+      grid.innerHTML = html;
     }
 
     // ═══════════════════════════════════════════════
     // RENDER
     // ═══════════════════════════════════════════════
     function render() {
-      const profile  = loadProfile();
-      let entries    = loadEntries();
+      const profile = loadProfile();
+      const allEntries = loadEntries();
+      const workList = allEntries.filter(isWorkEntry);
       const required = profile ? profile.hours : 486;
 
-      // Filter entries based on search input
+      let displayEntries = allEntries.slice();
       const search = document.getElementById('logSearch').value.toLowerCase().trim();
       if (search) {
-        entries = entries.filter(e => 
-          e.date.includes(search) || 
+        displayEntries = displayEntries.filter(e =>
+          e.date.includes(search) ||
           (e.notes && e.notes.toLowerCase().includes(search)) ||
           fmtDate(e.date).toLowerCase().includes(search)
         );
       }
 
-      const total     = entries.reduce((s,e)=>s+e.hours,0);
+      const total = workList.reduce((s, e) => s + e.hours, 0);
       const remaining = Math.max(0, required - total);
-      const pct       = Math.min(100, (total/required)*100);
+      const pct = Math.min(100, (total / required) * 100);
+      const restCount = allEntries.filter(e => e.isRest).length;
 
-      // ── Stats
-      document.getElementById('statTotal').textContent     = total.toFixed(1);
+      document.getElementById('statTotal').textContent = total.toFixed(1);
       document.getElementById('statRemaining').textContent = remaining.toFixed(1);
-      document.getElementById('statDays').textContent      = entries.length;
-      document.getElementById('statRemainingCard').className = 'stat-card'+(remaining===0?' done':'');
+      document.getElementById('statDays').textContent = workList.length;
+      document.getElementById('statRemainingCard').className = 'stat-card' + (remaining === 0 ? ' done' : '');
 
-      // ── Progress bar
       document.getElementById('progressLabel').textContent = `Progress toward ${required} hours`;
-      document.getElementById('progressPct').textContent   = pct.toFixed(1)+'%';
-      document.getElementById('progressFill').style.width  = pct+'%';
-      document.getElementById('progressFill').className    = 'progress-fill'+(pct>=100?' complete':'');
+      document.getElementById('progressPct').textContent = pct.toFixed(1) + '%';
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressFill').className = 'progress-fill' + (pct >= 100 ? ' complete' : '');
 
-      // ── Profile hero
+      const period = formatPeriodSummary(workList);
+      const linesEl = document.getElementById('summaryPeriodLines');
+      const weeksEl = document.getElementById('summaryWeeksBlock');
+      if (linesEl) {
+        linesEl.innerHTML =
+          '<div>This week (Mon–Sun): <strong>' + period.weekHrs.toFixed(1) + 'h</strong></div>' +
+          '<div>This calendar month: <strong>' + period.monthHrs.toFixed(1) + 'h</strong></div>' +
+          (restCount ? '<div>Rest / no-OT days logged: <strong>' + restCount + '</strong></div>' : '');
+      }
+      if (weeksEl) {
+        weeksEl.innerHTML = '<div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Recent weeks</div>' + buildWeekBarsHTML(workList);
+      }
+
       if (profile) {
-        document.getElementById('profileName').textContent  = profile.name;
+        document.getElementById('profileName').textContent = profile.name;
         document.getElementById('profileAvatar').textContent = initials(profile.name);
         document.getElementById('requiredHoursDisplay').textContent = profile.hours;
-        document.getElementById('headerSub').textContent    = `${profile.name}'s OJT progress`;
+        document.getElementById('headerSub').textContent = `${profile.name}'s OJT progress`;
 
-        // Auto-calculate estimated finish date from average daily pace
-        const dlEl   = document.getElementById('daysLeft');
+        const dlEl = document.getElementById('daysLeft');
         const dlCard = document.getElementById('deadlineRemainingDays');
         const dateEl = document.getElementById('deadlineDate');
+        let calendarDaysLeft = null;
+        if (profile.endDate) {
+          calendarDaysLeft = daysUntil(profile.endDate);
+        }
 
         if (remaining <= 0) {
-          dlEl.textContent  = '0';
+          dlEl.textContent = '0';
           dateEl.textContent = 'Done 🎉';
           document.getElementById('deadlineDateSub').textContent = 'all done!';
           dlCard.classList.add('done-item');
           document.getElementById('profileSub').textContent = 'OJT Hours Completed!';
           document.getElementById('paceAlert').style.display = 'none';
-        } else if (entries.length >= 1) {
-          const avgPerDay  = total / entries.length;
-          const daysNeeded = Math.ceil(remaining / avgPerDay);
-          dlEl.textContent   = daysNeeded;
-          dateEl.textContent = `in ${daysNeeded} day${daysNeeded===1?'':'s'}`;
-          document.getElementById('deadlineDateSub').textContent = 'at current pace';
-          dlCard.classList.remove('urgent','done-item');
+        } else if (workList.length >= 1) {
+          const avgPerDay = total / workList.length;
+          const daysNeeded = Math.max(1, Math.ceil(remaining / Math.max(avgPerDay, 0.01)));
+          dlEl.textContent = daysNeeded;
+          if (profile.endDate && calendarDaysLeft != null) {
+            const fd = fmtDate(profile.endDate);
+            if (calendarDaysLeft < 0) {
+              dateEl.textContent = 'Overdue';
+              document.getElementById('deadlineDateSub').textContent = 'past ' + fd;
+            } else {
+              dateEl.textContent = fd;
+              document.getElementById('deadlineDateSub').textContent = calendarDaysLeft + ' cal. days';
+            }
+          } else {
+            dateEl.textContent = `in ${daysNeeded} day${daysNeeded === 1 ? '' : 's'}`;
+            document.getElementById('deadlineDateSub').textContent = 'at current pace';
+          }
+          dlCard.classList.remove('urgent', 'done-item');
           if (daysNeeded <= 7) dlCard.classList.add('urgent');
-          document.getElementById('profileSub').textContent = `Est. finish in ${daysNeeded} day${daysNeeded===1?'':'s'}`;
-          if (entries.length >= 2) renderPaceAlert(total, remaining, daysNeeded, required);
+          if (profile.endDate && calendarDaysLeft != null && calendarDaysLeft < 0) {
+            document.getElementById('profileSub').textContent = 'Past target end date — adjust deadline or hours';
+          } else {
+            document.getElementById('profileSub').textContent =
+              profile.endDate && calendarDaysLeft != null && calendarDaysLeft >= 0
+                ? `${calendarDaysLeft} calendar day${calendarDaysLeft === 1 ? '' : 's'} until target`
+                : `Est. finish in ${daysNeeded} day${daysNeeded === 1 ? '' : 's'}`;
+          }
+          if (workList.length >= 2) renderPaceAlert(total, remaining, daysNeeded, required, calendarDaysLeft);
           else document.getElementById('paceAlert').style.display = 'none';
         } else {
-          dlEl.textContent   = '—';
-          dateEl.textContent = '—';
-          document.getElementById('deadlineDateSub').textContent = 'log days to see';
+          dlEl.textContent = '—';
+          if (profile.endDate && calendarDaysLeft != null && calendarDaysLeft >= 0) {
+            dateEl.textContent = fmtDate(profile.endDate);
+            document.getElementById('deadlineDateSub').textContent = calendarDaysLeft + ' cal. days left';
+          } else {
+            dateEl.textContent = '—';
+            document.getElementById('deadlineDateSub').textContent = 'log days to see';
+          }
           document.getElementById('profileSub').textContent = 'OJT Intern';
           document.getElementById('paceAlert').style.display = 'none';
         }
       }
 
-      // ── Table
-      renderTable(entries);
+      renderTable(displayEntries);
+      renderOtlCalendar();
+      maybeShowInstallTip();
+      updateBackupReminderUI();
     }
 
     /** Shows a smart pace message based on average daily pace */
-    function renderPaceAlert(totalDone, remaining, daysNeeded, required) {
+    function renderPaceAlert(totalDone, remaining, daysNeeded, required, calendarDaysLeft) {
       const alertEl = document.getElementById('paceAlert');
-      const textEl  = document.getElementById('paceText');
+      const textEl = document.getElementById('paceText');
 
       if (remaining <= 0) {
-        alertEl.className='pace-alert good';
-        textEl.textContent=`🎉 All ${required} hours completed! Great job!`;
-        alertEl.style.display='flex'; return;
+        alertEl.className = 'pace-alert good';
+        textEl.textContent = `🎉 All ${required} hours completed! Great job!`;
+        alertEl.style.display = 'flex';
+        return;
       }
 
-      const entries   = loadEntries();
-      const avgPerDay = entries.length > 0 ? totalDone / entries.length : 0;
+      const workList = loadEntries().filter(isWorkEntry);
+      const avgPerDay = workList.length > 0 ? totalDone / workList.length : 0;
 
       if (avgPerDay === 0) {
-        alertEl.className='pace-alert neutral';
-        textEl.textContent=`Log more days to see your pace estimate.`;
-        alertEl.style.display='flex'; return;
+        alertEl.className = 'pace-alert neutral';
+        textEl.textContent = 'Log more work days to see your pace estimate.';
+        alertEl.style.display = 'flex';
+        return;
       }
 
       const needed = (remaining / daysNeeded).toFixed(2);
+      let msg = '';
+      let cls = 'pace-alert good';
 
       if (daysNeeded <= 30) {
-        alertEl.className='pace-alert good';
-        textEl.textContent=`✅ Great pace! At ${avgPerDay.toFixed(2)} hrs/day avg, you'll finish in ~${daysNeeded} days (${needed} hrs/day needed).`;
+        cls = 'pace-alert good';
+        msg = `✅ Great pace! At ${avgPerDay.toFixed(2)} hrs/day avg (work days), you'll finish hours in ~${daysNeeded} days (~${needed} hrs/workday needed).`;
       } else if (daysNeeded <= 60) {
-        alertEl.className='pace-alert warn';
-        textEl.textContent=`⚠️ Moderate pace. You'll finish in ~${daysNeeded} days at ${avgPerDay.toFixed(2)} hrs/day. Try to increase to ${needed} hrs/day.`;
+        cls = 'pace-alert warn';
+        msg = `⚠️ Moderate pace. ~${daysNeeded} work days at ${avgPerDay.toFixed(2)} hrs/day. Try to reach ~${needed} hrs/workday.`;
       } else {
-        alertEl.className='pace-alert behind';
-        textEl.textContent=`🚨 Slow pace! At current rate it'll take ~${daysNeeded} days. Aim for ${needed} hrs/day to finish sooner.`;
+        cls = 'pace-alert behind';
+        msg = `🚨 Slow pace: ~${daysNeeded} work days at this rate. Aim for ~${needed} hrs/workday to finish sooner.`;
       }
-      alertEl.style.display='flex';
+
+      if (calendarDaysLeft != null && calendarDaysLeft >= 0 && daysNeeded > calendarDaysLeft) {
+        cls = 'pace-alert behind';
+        msg += ` Your target date is in ${calendarDaysLeft} calendar day${calendarDaysLeft === 1 ? '' : 's'} — pace may not be enough to finish on time.`;
+      } else if (calendarDaysLeft != null && calendarDaysLeft < 0) {
+        cls = 'pace-alert behind';
+        msg += ' Your target end date has passed — update your target date or log remaining hours.';
+      }
+
+      alertEl.className = cls;
+      textEl.textContent = msg;
+      alertEl.style.display = 'flex';
     }
 
     function renderTable(entries) {
       const area = document.getElementById('tableArea');
       if (!entries.length) {
-        area.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><p>No entries yet. Log your first day above!</p></div>`;
+        area.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>No entries yet. Log your first day above!</p></div>`;
         return;
       }
 
-      // We need the original indices from the full entries list for editing/deleting
       const allEntries = loadEntries();
+      const idToIndex = {};
+      allEntries.forEach((ae, i) => { idToIndex[ae.id] = i; });
 
-      const rows=[...entries].reverse().map((e,ri)=>{
-        // Find the index in the original list
-        const idx = allEntries.findIndex(ae => ae.date === e.date && ae.timeIn === e.timeIn && ae.timeOut === e.timeOut);
-        
-        const notesText = e.notes ? e.notes.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : '';
+      const rows = [...entries].reverse().map(e => {
+        const idx = e.id != null && idToIndex[e.id] != null ? idToIndex[e.id] : allEntries.findIndex(ae => ae.id === e.id);
+        const rest = !!e.isRest;
+        const tin = rest ? '—' : fmtTime(e.timeIn);
+        const tout = rest ? '—' : fmtTime(e.timeOut);
+        const hrsHtml = rest
+          ? '<span class="hours-badge rest">Rest</span>'
+          : `<span class="hours-badge">${e.hours.toFixed(2)}h</span>`;
+        const notesText = e.notes ? e.notes.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') : '';
         const notesHtml = notesText
           ? `<div style="font-size:11px;color:var(--text-muted);margin-top:3px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${notesText}">📝 ${notesText}</div>`
           : '<span style="color:var(--border);font-size:12px">—</span>';
-        return `<tr>
+        return `<tr class="${rest ? 'row-rest' : ''}">
           <td>${fmtDate(e.date)}</td>
-          <td>${fmtTime(e.timeIn)}</td>
-          <td>${fmtTime(e.timeOut)}</td>
-          <td><span class="hours-badge">${e.hours.toFixed(2)}h</span></td>
+          <td>${tin}</td>
+          <td>${tout}</td>
+          <td>${hrsHtml}</td>
           <td>${notesHtml}</td>
           <td><div class="td-actions">
-            <button class="btn btn-edit-ghost" data-edit="${idx}">✏️</button>
-            <button class="btn btn-danger-ghost" data-del="${idx}">🗑</button>
+            <button type="button" class="btn btn-edit-ghost" data-edit="${idx}" aria-label="Edit entry">✏️</button>
+            <button type="button" class="btn btn-danger-ghost" data-del="${idx}" aria-label="Delete entry">🗑</button>
           </div></td>
         </tr>`;
       }).join('');
-      area.innerHTML=`<div class="table-wrapper"><table>
+      area.innerHTML = `<div class="table-wrapper"><table>
         <thead><tr><th>Date</th><th>Time In</th><th>Time Out</th><th>Hours</th><th>Notes</th><th style="text-align:right">Actions</th></tr></thead>
         <tbody>${rows}</tbody>
       </table></div>`;
@@ -1114,64 +1718,119 @@
     // ADD ENTRY
     // ═══════════════════════════════════════════════
     function addEntry() {
-      const d=document.getElementById('inputDate').value;
-      const i=document.getElementById('inputTimeIn').value;
-      const o=document.getElementById('inputTimeOut').value;
-      const err=document.getElementById('formError');
-      if (!d){showToast('Please select a date.','error');return;}
-      if (toMins(o)<=toMins(i)){
-        err.classList.add('visible');
-        document.getElementById('inputTimeOut').classList.add('error');
-        return;
-      }
-      err.classList.remove('visible');
-      document.getElementById('inputTimeOut').classList.remove('error');
+      const d = document.getElementById('inputDate').value;
+      const err = document.getElementById('formError');
       const notes = document.getElementById('inputNotes').value.trim();
-      const entry={date:d,timeIn:i,timeOut:o,hours:calcHrs(i,o),notes};
-      const entries=loadEntries(); entries.push(entry); saveEntries(entries);
-      showToast(`✅ Logged ${entry.hours.toFixed(2)} hours`,'success');
+      const rest = document.getElementById('inputRestDay').checked;
+      if (!d) { showToast('Please select a date.', 'error'); return; }
+
+      const entries = loadEntries();
+      let entry;
+
+      if (rest) {
+        err.classList.remove('visible');
+        document.getElementById('inputTimeOut').classList.remove('error');
+        entry = {
+          id: newEntryId(),
+          date: d,
+          isRest: true,
+          timeIn: '',
+          timeOut: '',
+          hours: 0,
+          notes: notes || 'Rest / no OJT',
+        };
+      } else {
+        const i = document.getElementById('inputTimeIn').value;
+        const o = document.getElementById('inputTimeOut').value;
+        if (toMins(o) <= toMins(i)) {
+          err.classList.add('visible');
+          document.getElementById('inputTimeOut').classList.add('error');
+          return;
+        }
+        err.classList.remove('visible');
+        document.getElementById('inputTimeOut').classList.remove('error');
+        if (entryOverlapsSameDay(entries, d, i, o, null)) {
+          if (!confirm('This time range overlaps another entry on the same date. Add anyway?')) return;
+        }
+        entry = {
+          id: newEntryId(),
+          date: d,
+          timeIn: i,
+          timeOut: o,
+          hours: calcHrs(i, o),
+          notes,
+        };
+      }
+
+      entries.push(entry);
+      saveEntries(entries);
+      showToast(rest ? '✅ Rest day logged' : `✅ Logged ${entry.hours.toFixed(2)} hours`, 'success');
       render();
-      document.getElementById('inputDate').value='';
-      document.getElementById('inputNotes').value='';
+      const d0 = new Date(), pad0 = n => String(n).padStart(2, '0');
+      document.getElementById('inputDate').value = `${d0.getFullYear()}-${pad0(d0.getMonth() + 1)}-${pad0(d0.getDate())}`;
+      document.getElementById('inputNotes').value = '';
+      document.getElementById('inputRestDay').checked = false;
+      syncRestDayForm();
     }
 
     // ═══════════════════════════════════════════════
     // DELETE
     // ═══════════════════════════════════════════════
-    function deleteEntry(idx){
-      if(!confirm('Delete this entry?'))return;
-      const e=loadEntries(); e.splice(idx,1); saveEntries(e);
-      showToast('Entry deleted.'); render();
+    function deleteEntry(idx) {
+      if (!confirm('Delete this entry?')) return;
+      const list = loadEntries();
+      const removed = JSON.parse(JSON.stringify(list[idx]));
+      list.splice(idx, 1);
+      saveEntries(list);
+      showUndoBar(removed);
+      showToast('Entry deleted.');
+      render();
     }
 
     // ═══════════════════════════════════════════════
     // EDIT ENTRY MODAL
     // ═══════════════════════════════════════════════
-    function openEdit(idx){
-      const e=loadEntries()[idx];
-      document.getElementById('editIndex').value=idx;
-      document.getElementById('editDate').value=e.date;
-      document.getElementById('editTimeIn').value=e.timeIn;
-      document.getElementById('editTimeOut').value=e.timeOut;
-      document.getElementById('editNotes').value=e.notes||'';
+    function openEdit(idx) {
+      const e = loadEntries()[idx];
+      document.getElementById('editIndex').value = idx;
+      document.getElementById('editDate').value = e.date;
+      document.getElementById('editIsRest').checked = !!e.isRest;
+      document.getElementById('editTimeIn').value = e.timeIn || '08:00';
+      document.getElementById('editTimeOut').value = e.timeOut || '17:00';
+      document.getElementById('editNotes').value = e.notes || '';
       document.getElementById('editError').classList.remove('visible');
+      syncEditRestForm();
       document.getElementById('editModal').classList.add('open');
     }
-    function saveEdit(){
-      const idx=parseInt(document.getElementById('editIndex').value);
-      const d=document.getElementById('editDate').value;
-      const i=document.getElementById('editTimeIn').value;
-      const o=document.getElementById('editTimeOut').value;
-      const err=document.getElementById('editError');
-      if(!d){showToast('Please select a date.','error');return;}
-      if(toMins(o)<=toMins(i)){err.classList.add('visible');return;}
-      err.classList.remove('visible');
-      const notes=document.getElementById('editNotes').value.trim();
-      const entries=loadEntries();
-      entries[idx]={date:d,timeIn:i,timeOut:o,hours:calcHrs(i,o),notes};
+    function saveEdit() {
+      const idx = parseInt(document.getElementById('editIndex').value, 10);
+      const d = document.getElementById('editDate').value;
+      const rest = document.getElementById('editIsRest').checked;
+      const err = document.getElementById('editError');
+      if (!d) { showToast('Please select a date.', 'error'); return; }
+
+      const notes = document.getElementById('editNotes').value.trim();
+      const entries = loadEntries();
+      const prevId = entries[idx].id;
+
+      if (rest) {
+        err.classList.remove('visible');
+        entries[idx] = { id: prevId, date: d, isRest: true, timeIn: '', timeOut: '', hours: 0, notes: notes || 'Rest / no OJT' };
+      } else {
+        const i = document.getElementById('editTimeIn').value;
+        const o = document.getElementById('editTimeOut').value;
+        if (toMins(o) <= toMins(i)) { err.classList.add('visible'); return; }
+        err.classList.remove('visible');
+        if (entryOverlapsSameDay(entries, d, i, o, prevId)) {
+          if (!confirm('This overlaps another entry on the same date. Save anyway?')) return;
+        }
+        entries[idx] = { id: prevId, date: d, timeIn: i, timeOut: o, hours: calcHrs(i, o), notes };
+      }
+
       saveEntries(entries);
-      showToast('✅ Entry updated.','success');
-      closeModal('editModal'); render();
+      showToast('✅ Entry updated.', 'success');
+      closeModal('editModal');
+      render();
     }
 
     // ═══════════════════════════════════════════════
@@ -1181,7 +1840,38 @@
     document.getElementById('editModal').addEventListener('click',function(e){if(e.target===this)closeModal('editModal');});
     document.getElementById('profileModal').addEventListener('click',function(e){if(e.target===this)closeModal('profileModal');});
     document.getElementById('themeStyleModal').addEventListener('click',function(e){if(e.target===this)closeModal('themeStyleModal');});
+    document.getElementById('calendarDayModal').addEventListener('click',function(e){if(e.target===this)closeModal('calendarDayModal');});
     document.getElementById('qrModal').addEventListener('click',function(e){if(e.target===this)closeModal('qrModal');});
+
+    document.getElementById('otlCalPrev').addEventListener('click', function () {
+      ensureOtlCalMonth();
+      otlCalMonth -= 1;
+      if (otlCalMonth < 0) {
+        otlCalMonth = 11;
+        otlCalYear -= 1;
+      }
+      renderOtlCalendar();
+    });
+    document.getElementById('otlCalNext').addEventListener('click', function () {
+      ensureOtlCalMonth();
+      otlCalMonth += 1;
+      if (otlCalMonth > 11) {
+        otlCalMonth = 0;
+        otlCalYear += 1;
+      }
+      renderOtlCalendar();
+    });
+    document.getElementById('otlCalToday').addEventListener('click', function () {
+      const n = new Date();
+      otlCalYear = n.getFullYear();
+      otlCalMonth = n.getMonth();
+      renderOtlCalendar();
+    });
+    document.getElementById('otlCalGrid').addEventListener('click', function (e) {
+      const btn = e.target.closest('[data-cal-date]');
+      if (!btn || !btn.dataset.calDate) return;
+      openCalendarDayModal(btn.dataset.calDate);
+    });
 
     let qrInstance = null;
     function openQRModal() {
@@ -1221,11 +1911,13 @@
       const csv=[
         [`Name:${profile?profile.name:''}`,`Required Hours:${profile?profile.hours:486}`],
         [],
-        ['Date','Time In','Time Out','Hours Worked','Notes'],
-        ...entries.map(e=>[e.date,e.timeIn,e.timeOut,e.hours.toFixed(2),`"${(e.notes||'').replace(/"/g,'""')}"`])
+        ['Date','Time In','Time Out','Hours Worked','Type','Notes'],
+        ...entries.map(e=>[e.date,e.timeIn||'',e.timeOut||'',e.hours.toFixed(2),e.isRest?'Rest':'Work',`"${(e.notes||'').replace(/"/g,'""')}"`])
       ].map(r=>r.join(',')).join('\n');
       const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([csv],{type:'text/csv'})),download:'ojt_hours.csv'});
-      a.click(); showToast('CSV exported!','success');
+      a.click();
+      recordBackupExport();
+      showToast('CSV exported!','success');
     }
 
     // ═══════════════════════════════════════════════
@@ -1325,6 +2017,7 @@
         download: `internlog_backup_${new Date().toISOString().split('T')[0]}.json`
       });
       a.click();
+      recordBackupExport();
       showToast('Backup exported! 💾', 'success');
     }
 
@@ -1354,12 +2047,26 @@
         const timeIn = matches[1].replace(/"/g, '').trim();
         const timeOut = matches[2].replace(/"/g, '').trim();
         const hoursWorked = parseFloat(matches[3].replace(/"/g, '').trim());
-        const notes = matches[4] ? matches[4].replace(/^"|"$/g, '').replace(/""/g, '"').trim() : '';
+        let notes = '';
+        let typeRest = false;
+        if (matches.length >= 6) {
+          typeRest = matches[4].replace(/"/g, '').trim() === 'Rest';
+          notes = matches[5] ? matches[5].replace(/^"|"$/g, '').replace(/""/g, '"').trim() : '';
+        } else {
+          notes = matches[4] ? matches[4].replace(/^"|"$/g, '').replace(/""/g, '"').trim() : '';
+        }
 
-        entries.push({ date, timeIn, timeOut, hours: hoursWorked, notes });
+        const row = { date, timeIn, timeOut, hours: hoursWorked, notes };
+        if (typeRest) {
+          row.isRest = true;
+          row.hours = 0;
+          row.timeIn = '';
+          row.timeOut = '';
+        }
+        entries.push(row);
       }
 
-      return { profile: { name, hours }, entries };
+      return { profile: { name, hours, endDate: '', breakHours: 1 }, entries };
     }
 
     function processImportData(content, fileName, fileType) {
@@ -1386,12 +2093,21 @@
         }
         
         if (confirm('Importing will overwrite your current data. Continue?')) {
-          if (data.profile) saveProfileData(data.profile);
-          saveEntries(data.entries);
+          if (data.profile) {
+            const p = data.profile;
+            const bh = parseFloat(p.breakHours);
+            saveProfileData({
+              name: p.name || '',
+              hours: Math.max(1, parseInt(p.hours, 10) || 486),
+              endDate: typeof p.endDate === 'string' ? p.endDate : '',
+              breakHours: !isNaN(bh) && bh >= 0 && bh <= 12 ? bh : 1,
+            });
+          }
+          saveEntries(data.entries.map(e => Object.assign({}, e, { id: e.id || newEntryId() })));
           if (typeof data.accent === 'string' && data.accent.trim())
             persistAccent(data.accent);
           render();
-          showToast('Data restored successfully! 📂', 'success');
+          showToast('Import finished. Your log and profile were updated from the file.', 'success');
           return true;
         }
       } catch (err) {
@@ -1421,6 +2137,7 @@
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.addEventListener('message', event => {
           if (event.data && event.data.type === 'file-shared') {
+            showToast('File received from another app. Confirm import to load it into InternLog.', 'neutral');
             processImportData(event.data.text, event.data.fileName || 'shared.csv', 'text/csv');
           }
         });
@@ -1428,13 +2145,14 @@
 
       window.addEventListener('load', () => {
         if (window.location.search.includes('share-target')) {
-          showToast('Processing shared file...', 'success');
+          showToast('Use the import confirmation to add the shared file to your log.', 'success');
         }
       });
 
       // Set default date to today
       const d=new Date(), pad=n=>String(n).padStart(2,'0');
       document.getElementById('inputDate').value=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+      syncRestDayForm();
 
       // Check if profile exists
       const profile = loadProfile();

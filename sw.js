@@ -1,4 +1,4 @@
-const CACHE_NAME = 'internlog-cache-v6'; // bump when app shell changes; v6: fresh HTML updates
+const CACHE_NAME = 'internlog-cache-v8'; // v8: month calendar view
 const urlsToCache = [
   '/',
   'index.html',

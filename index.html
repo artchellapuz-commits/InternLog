@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="InternLog" />
-  <meta name="theme-color" content="#e05c2a" />
+  <meta name="theme-color" id="themeColorMeta" content="#e05c2a" />
   <title>InternLog – OJT Hours Tracker</title>
   <link rel="apple-touch-icon" id="appleIcon" />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -18,7 +18,8 @@
     :root {
       --bg:#f0ede8; --surface:#fff; --surface-2:#f7f4ef; --border:#e2ddd6;
       --text:#1a1714; --text-muted:#7a736b;
-      --accent:#e05c2a; --accent-light:#fce9e1; --accent-dark:#b8421a;
+      --accent:#e05c2a; --accent-soft:#f5824a; --accent-light:#fce9e1; --accent-dark:#b8421a;
+      --accent-rgb:224, 92, 42;
       --green:#2e9e6b; --green-light:#d4f0e4;
       --blue:#2563eb; --blue-light:#dbeafe;
       --warn:#d97706; --warn-light:#fef3c7;
@@ -32,7 +33,7 @@
     [data-theme="dark"] {
       --bg:#16130f; --surface:#211d18; --surface-2:#2a251f; --border:#3a332a;
       --text:#f0ece6; --text-muted:#8a7f73;
-      --accent-light:#3d2017; --green-light:#0e3325;
+      --green-light:#0e3325;
       --blue-light:#1e3a5f; --warn-light:#2d1f07; --danger-light:#2e0f0c;
       --shadow:0 2px 16px rgba(0,0,0,.4); --shadow-lg:0 8px 32px rgba(0,0,0,.5);
     }
@@ -57,11 +58,13 @@
     .header-left h1{font-family:var(--font-display);font-size:clamp(1.6rem,5vw,2.2rem);font-weight:800;line-height:1.1;letter-spacing:-.5px}
     .header-left h1 .accent{color:var(--accent)}
     .header-left p{color:var(--text-muted);font-size:13px;margin-top:4px}
-    .header-actions{display:flex;gap:8px;align-items:center;flex-shrink:0;margin-top:4px}
+    .header-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end;flex-shrink:0;margin-top:4px;max-width:min(100%,280px)}
+    .btn-header-theme{display:inline-flex;align-items:center;gap:5px;background:var(--surface);border:1.5px solid var(--border);border-radius:99px;padding:0 12px;height:40px;font-size:12px;font-weight:600;color:var(--text);cursor:pointer;font-family:var(--font-body);transition:var(--tr);white-space:nowrap}
+    .btn-header-theme:hover{background:var(--surface-2)}
 
     /* ── PROFILE HERO CARD ── */
     .profile-hero{
-      background:linear-gradient(135deg,var(--accent) 0%,#f5824a 100%);
+      background:linear-gradient(135deg,var(--accent) 0%,var(--accent-soft) 100%);
       border-radius:var(--radius);
       padding:20px;
       margin-bottom:16px;
@@ -115,7 +118,7 @@
     .setup-field{margin-bottom:16px}
     .setup-field label{display:block;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
     .setup-field input{width:100%;font-family:var(--font-body);font-size:15px;font-weight:500;color:var(--text);background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;outline:none;transition:var(--tr)}
-    .setup-field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(224,92,42,.12)}
+    .setup-field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12)}
     .setup-hint{font-size:12px;color:var(--text-muted);margin-top:5px}
     .setup-btn{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-family:var(--font-display);font-size:15px;font-weight:800;cursor:pointer;transition:var(--tr);margin-top:8px}
     .setup-btn:hover{background:var(--accent-dark);transform:translateY(-1px)}
@@ -125,7 +128,7 @@
     /* ── BUTTONS ── */
     .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:var(--font-body);font-size:13px;font-weight:600;transition:var(--tr);white-space:nowrap}
     .btn-primary{background:var(--accent);color:#fff;width:100%;justify-content:center;padding:13px;font-size:14px}
-    .btn-primary:hover{background:var(--accent-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(224,92,42,.35)}
+    .btn-primary:hover{background:var(--accent-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(var(--accent-rgb),.35)}
     .btn-primary:active{transform:translateY(0)}
     .btn-ghost{background:transparent;color:var(--text-muted);border:1.5px solid var(--border)}
     .btn-ghost:hover{background:var(--surface-2);color:var(--text)}
@@ -155,7 +158,7 @@
     .progress-label{font-size:13px;font-weight:600}
     .progress-pct{font-family:var(--font-display);font-size:16px;font-weight:800;color:var(--accent)}
     .progress-track{height:12px;background:var(--surface-2);border-radius:99px;overflow:hidden;border:1.5px solid var(--border)}
-    .progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#f5824a);transition:width .6s cubic-bezier(.4,0,.2,1)}
+    .progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent-soft));transition:width .6s cubic-bezier(.4,0,.2,1)}
     .progress-fill.complete{background:linear-gradient(90deg,var(--green),#4ec898)}
 
     /* ── PACE ALERT ── */
@@ -173,8 +176,10 @@
     .form-group{display:flex;flex-direction:column;gap:5px}
     .form-group label{font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}
     .form-group input{font-family:var(--font-body);font-size:14px;font-weight:500;color:var(--text);background:var(--surface-2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;outline:none;transition:var(--tr);width:100%}
-    .form-group input:focus{border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 3px rgba(224,92,42,.12)}
+    .form-group input:focus{border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12)}
     .form-group input.error{border-color:var(--danger)}
+    .form-notes{font-family:var(--font-body);font-size:14px;font-weight:500;color:var(--text);background:var(--surface-2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;outline:none;transition:var(--tr);width:100%;resize:vertical;line-height:1.5}
+    .form-notes:focus{border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12)}
     .error-msg{color:var(--danger);font-size:12px;font-weight:500;margin-top:-6px;display:none}
     .error-msg.visible{display:block}
 
@@ -209,6 +214,12 @@
     .modal-desc{font-size:13px;color:var(--text-muted);margin-bottom:16px}
     .modal-actions{display:flex;gap:8px;margin-top:16px}
     .modal-actions .btn{flex:1;justify-content:center}
+    .theme-color-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:8px}
+    .theme-swatches{display:flex;flex-wrap:wrap;gap:8px;flex:1;min-width:0}
+    .theme-swatch{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);cursor:pointer;padding:0;transition:var(--tr);flex-shrink:0}
+    .theme-swatch:hover{transform:scale(1.08)}
+    .theme-swatch[aria-pressed="true"]{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--accent)}
+    .theme-color-picker{width:44px;height:36px;padding:0;border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;background:var(--surface-2)}
 
     /* ── SECTION TITLE ── */
     .section-title{font-family:var(--font-display);font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
@@ -219,7 +230,7 @@
     .toolbar-left{display:flex;flex:1;min-width:200px}
     .toolbar-right{display:flex;gap:8px;flex-shrink:0}
     .search-input{width:100%;font-family:var(--font-body);font-size:13px;padding:8px 12px 8px 32px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--surface-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%237a736b' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E") no-repeat 10px center;outline:none;transition:var(--tr)}
-    .search-input:focus{border-color:var(--accent);background-color:var(--surface);box-shadow:0 0 0 3px rgba(224,92,42,.12)}
+    .search-input:focus{border-color:var(--accent);background-color:var(--surface);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12)}
 
     /* ── OFFLINE BADGE ── */
     #offlineBadge{display:none;background:var(--text-muted);color:var(--bg);font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;vertical-align:middle;margin-left:6px}
@@ -285,6 +296,7 @@
       </div>
       <div class="header-actions">
         <button class="toggle-dark" id="qrBtn" onclick="openQRModal()" title="Share QR Code">📱</button>
+        <button type="button" class="btn-header-theme" id="themeStyleBtn" onclick="openThemeStyleModal()" title="Pick theme color">🎨 Theme</button>
         <button class="toggle-dark" id="darkToggle">🌙</button>
       </div>
     </div>
@@ -377,7 +389,7 @@
       </div>
       <div class="form-group" style="margin-bottom:12px">
         <label for="inputNotes">Notes / Remarks <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted)">(optional)</span></label>
-        <textarea id="inputNotes" rows="2" placeholder="e.g. Worked on inventory system, attended standup..." style="font-family:var(--font-body);font-size:14px;font-weight:500;color:var(--text);background:var(--surface-2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;outline:none;transition:var(--tr);width:100%;resize:vertical;line-height:1.5" onfocus="this.style.borderColor='var(--accent)';this.style.background='var(--surface)';this.style.boxShadow='0 0 0 3px rgba(224,92,42,.12)'" onblur="this.style.borderColor='';this.style.background='';this.style.boxShadow=''"></textarea>
+        <textarea id="inputNotes" class="form-notes" rows="2" placeholder="e.g. Worked on inventory system, attended standup..."></textarea>
       </div>
       <p class="error-msg" id="formError">⚠ Time Out must be after Time In.</p>
       <button class="btn btn-primary" onclick="addEntry()">＋ &nbsp;Log Hours</button>
@@ -415,7 +427,7 @@
         <div class="form-group"><label>Time Out</label><input type="time" id="editTimeOut" /></div>
         <div class="form-group">
           <label>Notes / Remarks <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted)">(optional)</span></label>
-          <textarea id="editNotes" rows="2" placeholder="What did you work on?" style="font-family:var(--font-body);font-size:14px;font-weight:500;color:var(--text);background:var(--surface-2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;outline:none;transition:var(--tr);width:100%;resize:vertical;line-height:1.5" onfocus="this.style.borderColor='var(--accent)';this.style.background='var(--surface)';this.style.boxShadow='0 0 0 3px rgba(224,92,42,.12)'" onblur="this.style.borderColor='';this.style.background='';this.style.boxShadow=''"></textarea>
+          <textarea id="editNotes" class="form-notes" rows="2" placeholder="What did you work on?"></textarea>
         </div>
       </div>
       <p class="error-msg" id="editError">⚠ Time Out must be after Time In.</p>
@@ -446,6 +458,17 @@
       </div>
 
       <div class="modal-divider"></div>
+      <p class="modal-desc" style="margin-bottom:8px">Theme color</p>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Accent for buttons, progress, and the browser status bar when installed.</p>
+      <div class="theme-color-row">
+        <div class="theme-swatches" id="themeSwatches" role="group" aria-label="Preset theme colors"></div>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);cursor:pointer;font-weight:600;text-transform:uppercase;letter-spacing:.5px">
+          Custom
+          <input type="color" id="themeColorPicker" class="theme-color-picker" value="#e05c2a" title="Custom accent color" />
+        </label>
+      </div>
+
+      <div class="modal-divider"></div>
       <p style="font-size:12px;color:var(--danger);margin-bottom:12px;font-weight:500">⚠ Danger Zone</p>
       <button class="btn btn-danger-ghost" style="width:100%;justify-content:center;border-color:var(--danger)" onclick="resetAllData()">🗑 Reset All Data & Start Over</button>
 
@@ -453,6 +476,26 @@
       <div class="modal-actions">
         <button class="btn btn-ghost" onclick="closeModal('profileModal')">Cancel</button>
         <button class="btn btn-primary" style="background:var(--accent)" onclick="saveProfileModal()">Save Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       THEME STYLE MODAL
+  ══════════════════════════════════════ -->
+  <div class="modal-overlay" id="themeStyleModal">
+    <div class="modal" style="max-width:420px">
+      <h2>🎨 Theme Style</h2>
+      <p class="modal-desc">Pick your preferred accent color.</p>
+      <div class="theme-color-row">
+        <div class="theme-swatches" id="themeSwatchesQuick" role="group" aria-label="Theme styles"></div>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);cursor:pointer;font-weight:600;text-transform:uppercase;letter-spacing:.5px">
+          Custom
+          <input type="color" id="themeColorPickerQuick" class="theme-color-picker" value="#e05c2a" title="Custom theme color" />
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" style="background:var(--accent)" onclick="closeModal('themeStyleModal')">Done</button>
       </div>
     </div>
   </div>
@@ -477,52 +520,185 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <script>
+    const KEY_ACCENT = 'ojt_accent';
+    const DEFAULT_ACCENT = '#e05c2a';
+    const ACCENT_PRESETS = [
+      { hex: '#e05c2a', label: 'Orange' },
+      { hex: '#db2777', label: 'Pink' },
+      { hex: '#c026d3', label: 'Fuchsia' },
+      { hex: '#7c3aed', label: 'Violet' },
+      { hex: '#2563eb', label: 'Blue' },
+      { hex: '#0891b2', label: 'Cyan' },
+      { hex: '#059669', label: 'Emerald' },
+      { hex: '#ca8a04', label: 'Amber' },
+      { hex: '#64748b', label: 'Slate' },
+    ];
+
+    function normalizeHex(hex) {
+      hex = (hex || '').trim();
+      if (!hex.startsWith('#')) hex = '#' + hex;
+      if (/^#[0-9A-Fa-f]{3}$/.test(hex))
+        hex = '#' + hex.slice(1).split('').map(function (c) { return c + c; }).join('');
+      return /^#[0-9A-Fa-f]{6}$/.test(hex) ? hex.toLowerCase() : DEFAULT_ACCENT;
+    }
+
+    function hexToRgb(hex) {
+      const h = normalizeHex(hex).slice(1);
+      const n = parseInt(h, 16);
+      return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    }
+
+    function rgbToHex(r, g, b) {
+      return '#' + [r, g, b].map(function (x) {
+        return Math.max(0, Math.min(255, Math.round(x))).toString(16).padStart(2, '0');
+      }).join('');
+    }
+
+    function mixRgb(a, b, t) {
+      return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+    }
+
+    function getStoredAccent() {
+      return normalizeHex(localStorage.getItem(KEY_ACCENT) || DEFAULT_ACCENT);
+    }
+
+    function buildIconSVG(accent) {
+      return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">' +
+        '<rect width="512" height="512" rx="112" fill="' + accent + '"/>' +
+        '<rect x="140" y="120" width="232" height="272" rx="16" fill="white"/>' +
+        '<rect x="172" y="84" width="44" height="64" rx="12" fill="' + accent + '" opacity="0.9"/>' +
+        '<rect x="296" y="84" width="44" height="64" rx="12" fill="' + accent + '" opacity="0.9"/>' +
+        '<rect x="168" y="192" width="176" height="16" rx="8" fill="' + accent + '" opacity="0.8"/>' +
+        '<rect x="168" y="228" width="140" height="12" rx="6" fill="' + accent + '" opacity="0.4"/>' +
+        '<rect x="168" y="256" width="160" height="12" rx="6" fill="' + accent + '" opacity="0.4"/>' +
+        '<rect x="168" y="284" width="120" height="12" rx="6" fill="' + accent + '" opacity="0.4"/>' +
+        '<circle cx="364" cy="364" r="76" fill="#2e9e6b"/>' +
+        '<rect x="348" y="326" width="16" height="60" rx="8" fill="white"/>' +
+        '<rect x="326" y="348" width="60" height="16" rx="8" fill="white"/>' +
+        '</svg>';
+    }
+
+    function buildIconDataUrl(accentHex) {
+      return 'data:image/svg+xml,' + encodeURIComponent(buildIconSVG(normalizeHex(accentHex)));
+    }
+
+    let manifestBlobUrl = null;
+
+    function paintAccent(hex) {
+      hex = normalizeHex(hex);
+      const rgb = hexToRgb(hex);
+      const root = document.documentElement;
+      const isDark = root.getAttribute('data-theme') === 'dark';
+      var accentDark = rgbToHex.apply(null, mixRgb(rgb, [0, 0, 0], 0.35));
+      var accentLight = isDark
+        ? rgbToHex.apply(null, mixRgb([33, 29, 24], rgb, 0.5))
+        : rgbToHex.apply(null, mixRgb(rgb, [255, 255, 255], 0.82));
+      var accentSoft = rgbToHex.apply(null, mixRgb(rgb, [255, 255, 255], 0.38));
+      root.style.setProperty('--accent', hex);
+      root.style.setProperty('--accent-dark', accentDark);
+      root.style.setProperty('--accent-light', accentLight);
+      root.style.setProperty('--accent-soft', accentSoft);
+      root.style.setProperty('--accent-rgb', rgb.join(', '));
+      var meta = document.getElementById('themeColorMeta');
+      if (meta) meta.setAttribute('content', hex);
+    }
+
+    function rebuildManifest(themeColorHex) {
+      themeColorHex = normalizeHex(themeColorHex);
+      var iconURL = buildIconDataUrl(themeColorHex);
+      var manifest = {
+        name: 'InternLog – OJT Tracker', short_name: 'InternLog',
+        description: 'Track your OJT internship hours',
+        start_url: './', display: 'standalone',
+        background_color: '#f0ede8', theme_color: themeColorHex,
+        orientation: 'portrait-primary',
+        icons: [{ src: iconURL, sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }],
+        share_target: {
+          action: './',
+          method: 'POST',
+          enctype: 'multipart/form-data',
+          params: { files: [{ name: 'file', accept: ['*/*'] }] },
+        },
+      };
+      if (manifestBlobUrl) URL.revokeObjectURL(manifestBlobUrl);
+      manifestBlobUrl = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' }));
+      var mLink = document.getElementById('manifestLink');
+      if (!mLink) {
+        mLink = document.createElement('link');
+        mLink.id = 'manifestLink';
+        mLink.rel = 'manifest';
+        document.head.appendChild(mLink);
+      }
+      mLink.href = manifestBlobUrl;
+    }
+
+    function persistAccent(hex) {
+      hex = normalizeHex(hex);
+      localStorage.setItem(KEY_ACCENT, hex);
+      paintAccent(hex);
+      rebuildManifest(hex);
+      document.getElementById('appleIcon').href = buildIconDataUrl(hex);
+      syncThemePickerUI(hex);
+    }
+
+    function syncThemePickerUI(hex) {
+      hex = normalizeHex(hex);
+      document.querySelectorAll('.theme-color-picker').forEach(function (picker) {
+        picker.value = hex;
+      });
+      document.querySelectorAll('.theme-swatch').forEach(function (sw) {
+        var h = normalizeHex(sw.dataset.hex || '');
+        sw.setAttribute('aria-pressed', h === hex ? 'true' : 'false');
+      });
+    }
+
+    function initThemeControls(containerId, pickerId) {
+      containerId = containerId || 'themeSwatches';
+      pickerId = pickerId || 'themeColorPicker';
+      var container = document.getElementById(containerId);
+      var picker = document.getElementById(pickerId);
+      if (!container || !picker || container.dataset.inited) return;
+      container.dataset.inited = '1';
+      ACCENT_PRESETS.forEach(function (preset) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'theme-swatch';
+        b.style.background = preset.hex;
+        b.title = preset.label;
+        b.dataset.hex = preset.hex;
+        b.addEventListener('click', function () {
+          picker.value = preset.hex;
+          persistAccent(preset.hex);
+          showToast('Theme color updated', 'success');
+        });
+        container.appendChild(b);
+      });
+      picker.addEventListener('input', function () {
+        paintAccent(picker.value);
+      });
+      picker.addEventListener('change', function () {
+        persistAccent(picker.value);
+        showToast('Theme color updated', 'success');
+      });
+    }
+
+    function openThemeStyleModal() {
+      initThemeControls('themeSwatchesQuick', 'themeColorPickerQuick');
+      syncThemePickerUI(getStoredAccent());
+      document.getElementById('themeStyleModal').classList.add('open');
+    }
+
     // ═══════════════════════════════════════════════
     // PWA SETUP
     // ═══════════════════════════════════════════════
 
-    // Inline SVG Icon
-    const iconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-      <rect width="512" height="512" rx="112" fill="#e05c2a"/>
-      <rect x="140" y="120" width="232" height="272" rx="16" fill="white"/>
-      <rect x="172" y="84" width="44" height="64" rx="12" fill="#e05c2a" opacity="0.9"/>
-      <rect x="296" y="84" width="44" height="64" rx="12" fill="#e05c2a" opacity="0.9"/>
-      <rect x="168" y="192" width="176" height="16" rx="8" fill="#e05c2a" opacity="0.8"/>
-      <rect x="168" y="228" width="140" height="12" rx="6" fill="#e05c2a" opacity="0.4"/>
-      <rect x="168" y="256" width="160" height="12" rx="6" fill="#e05c2a" opacity="0.4"/>
-      <rect x="168" y="284" width="120" height="12" rx="6" fill="#e05c2a" opacity="0.4"/>
-      <circle cx="364" cy="364" r="76" fill="#2e9e6b"/>
-      <rect x="348" y="326" width="16" height="60" rx="8" fill="white"/>
-      <rect x="326" y="348" width="60" height="16" rx="8" fill="white"/>
-    </svg>`;
-    const iconURL = 'data:image/svg+xml,' + encodeURIComponent(iconSVG);
-    document.getElementById('appleIcon').href = iconURL;
-
-    // Inline Manifest
-    const mLink = document.createElement('link');
-    mLink.rel  = 'manifest';
-    mLink.href = URL.createObjectURL(new Blob([JSON.stringify({
-      name:"InternLog – OJT Tracker", short_name:"InternLog",
-      description:"Track your OJT internship hours",
-      start_url:"./", display:"standalone",
-      background_color:"#f0ede8", theme_color:"#e05c2a",
-      orientation:"portrait-primary",
-      icons:[{src:iconURL,sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}],
-      share_target: {
-        action: './',
-        method: 'POST',
-        enctype: 'multipart/form-data',
-        params: {
-          files: [
-            {
-              name: 'file',
-              accept: ['*/*']
-            }
-          ]
-        }
-      }
-    })], {type:'application/manifest+json'}));
-    document.head.appendChild(mLink);
+    document.documentElement.setAttribute('data-theme', localStorage.getItem('ojt_dark') === '1' ? 'dark' : 'light');
+    (function bootstrapAccentAndManifest() {
+      var accent = getStoredAccent();
+      paintAccent(accent);
+      document.getElementById('appleIcon').href = buildIconDataUrl(accent);
+      rebuildManifest(accent);
+    })();
 
     // Service Worker
     if ('serviceWorker' in navigator) {
@@ -618,6 +794,7 @@
       document.documentElement.setAttribute('data-theme', d?'dark':'light');
       darkBtn.textContent = d?'☀️':'🌙';
       localStorage.setItem('ojt_dark', d?'1':'0');
+      paintAccent(getStoredAccent());
     };
     applyTheme(localStorage.getItem('ojt_dark')==='1');
     darkBtn.addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')!=='dark'));
@@ -666,6 +843,8 @@
       document.getElementById('profileModalName').value    = p.name;
       document.getElementById('profileModalHours').value   = p.hours;
       document.getElementById('profileModalError').classList.remove('visible');
+      initThemeControls();
+      syncThemePickerUI(getStoredAccent());
       document.getElementById('profileModal').classList.add('open');
     }
 
@@ -685,6 +864,8 @@
       if (!confirm('This will delete ALL entries and your profile. Are you sure?')) return;
       localStorage.removeItem(KEY_ENTRIES);
       localStorage.removeItem(KEY_PROFILE);
+      localStorage.removeItem(KEY_ACCENT);
+      persistAccent(DEFAULT_ACCENT);
       closeModal('profileModal');
       showSetup();
     }
@@ -907,6 +1088,7 @@
     function closeModal(id){ document.getElementById(id).classList.remove('open'); }
     document.getElementById('editModal').addEventListener('click',function(e){if(e.target===this)closeModal('editModal');});
     document.getElementById('profileModal').addEventListener('click',function(e){if(e.target===this)closeModal('profileModal');});
+    document.getElementById('themeStyleModal').addEventListener('click',function(e){if(e.target===this)closeModal('themeStyleModal');});
     document.getElementById('qrModal').addEventListener('click',function(e){if(e.target===this)closeModal('qrModal');});
 
     let qrInstance = null;
@@ -1042,6 +1224,7 @@
       const data = {
         profile: loadProfile(),
         entries: loadEntries(),
+        accent: getStoredAccent(),
         exportDate: new Date().toISOString()
       };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -1113,6 +1296,8 @@
         if (confirm('Importing will overwrite your current data. Continue?')) {
           if (data.profile) saveProfileData(data.profile);
           saveEntries(data.entries);
+          if (typeof data.accent === 'string' && data.accent.trim())
+            persistAccent(data.accent);
           render();
           showToast('Data restored successfully! 📂', 'success');
           return true;

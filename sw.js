@@ -1,4 +1,4 @@
-const CACHE_NAME = 'internlog-cache-v5'; // Updated accept types for better mobile support
+const CACHE_NAME = 'internlog-cache-v6'; // bump when app shell changes; v6: fresh HTML updates
 const urlsToCache = [
   '/',
   'index.html',
@@ -51,13 +51,37 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  const req = event.request;
+  const isNavigate = req.mode === 'navigate';
+  const wantsHtml = (req.headers.get('accept') || '').includes('text/html');
+
+  if (isNavigate || wantsHtml) {
+    event.respondWith(
+      fetch(req)
+        .then(function (netRes) {
+          if (netRes && netRes.ok) {
+            const copy = netRes.clone();
+            caches.open(CACHE_NAME).then(function (cache) {
+              cache.put(req, copy);
+            });
+          }
+          return netRes;
+        })
+        .catch(function () {
+          return caches.match(req).then(function (r) {
+            return r || caches.match('index.html');
+          });
+        })
+    );
+    return;
+  }
+
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request).catch(() => caches.match('index.html'));
-      })
+    caches.match(req).then(function (response) {
+      if (response) return response;
+      return fetch(req).catch(function () {
+        return caches.match('index.html');
+      });
+    })
   );
 });

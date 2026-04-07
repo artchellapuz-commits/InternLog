@@ -51,3 +51,7 @@ Double-click **`index.html`** or drag it into a browser. The UI works for basic 
 | `sw.js`     | Service worker (cache + share target)     |
 
 No `npm install` or build step is required.
+
+## Developer
+
+InternLog was created by **Artchel**.

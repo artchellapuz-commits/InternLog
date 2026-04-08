@@ -1157,8 +1157,12 @@ function loadProfile() {
     }
 function saveProfileData(p) {
       // Ensure avatarB64 is valid data URL or null
-      if (p.avatarB64 && !p.avatarB64.startsWith('data:image/png;base64,')) {
-        p.avatarB64 = null;
+      if (p.avatarB64) {
+        const v = String(p.avatarB64);
+        // Accept any image data URL (png/jpg/webp/etc). Reject anything else.
+        if (!/^data:image\/[a-zA-Z0-9.+-]+(;charset=[^;,]+)?(;base64)?,/i.test(v)) {
+          p.avatarB64 = null;
+        }
       }
       localStorage.setItem(KEY_PROFILE, JSON.stringify(p));
       markDataChanged();

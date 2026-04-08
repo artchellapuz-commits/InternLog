@@ -84,14 +84,61 @@
       pointer-events:none;
     }
     .profile-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
-    .profile-avatar{
+.profile-avatar{
       width:52px;height:52px;border-radius:50%;
       background:rgba(255,255,255,.25);
+      flex-shrink:0;border:2px solid rgba(255,255,255,.4);
+      overflow:hidden;
+    }
+    .profile-avatar img{
+      width:100%;height:100%;object-fit:cover;display:block;
+    }
+    .profile-avatar .initials{
       display:flex;align-items:center;justify-content:center;
       font-size:22px;font-weight:800;font-family:var(--font-display);
-      color:#fff;flex-shrink:0;border:2px solid rgba(255,255,255,.4);
-      text-transform:uppercase;
+      color:#fff;width:100%;height:100%;text-transform:uppercase;
+      background:rgba(255,255,255,.25);
     }
+
+    /* ── AVATAR PICKER (PROFILE MODAL) ── */
+    .avatar-editor{display:flex;flex-direction:column;gap:10px;align-items:center}
+    .avatar-preview{
+      width:76px;height:76px;border-radius:50%;
+      overflow:hidden;background:var(--surface-2);
+      border:2px solid var(--border);
+      position:relative;
+      box-shadow:0 6px 18px rgba(0,0,0,.08);
+    }
+    [data-theme="dark"] .avatar-preview{box-shadow:0 10px 22px rgba(0,0,0,.35)}
+    .avatar-media{width:100%;height:100%}
+    .avatar-media img{width:100%;height:100%;object-fit:cover;display:block}
+    .avatar-placeholder{
+      width:100%;height:100%;
+      display:flex;align-items:center;justify-content:center;
+      color:var(--text-muted);
+      background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.02));
+    }
+    [data-theme="dark"] .avatar-placeholder{
+      background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
+    }
+    .avatar-fab{
+      position:absolute;right:-6px;bottom:-6px;
+      width:34px;height:34px;border-radius:999px;
+      display:flex;align-items:center;justify-content:center;
+      background:var(--surface);color:var(--accent);
+      border:2px solid rgba(var(--accent-rgb),.7);
+      box-shadow:0 8px 18px rgba(0,0,0,.16);
+      cursor:pointer;transition:var(--tr);
+    }
+    .avatar-fab:hover{
+      transform:translateY(-1px);
+      background:var(--surface-2);
+      box-shadow:0 10px 22px rgba(0,0,0,.22);
+    }
+    .avatar-fab:active{transform:translateY(0)}
+    .avatar-fab svg{width:17px;height:17px;display:block}
+    .avatar-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+    .btn-sm{padding:7px 12px;font-size:12px;height:auto}
     .profile-name-block{flex:1;min-width:0}
     .profile-name{font-family:var(--font-display);font-size:1.2rem;font-weight:800;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .profile-sub{font-size:12px;opacity:.8;margin-top:2px}
@@ -490,7 +537,7 @@
     <!-- ── PROFILE HERO ── -->
     <div class="profile-hero" id="profileHero">
       <div class="profile-top">
-        <div class="profile-avatar" id="profileAvatar">?</div>
+        <button class="profile-avatar" id="profileAvatar" type="button" onclick="openAvatarPreview()" aria-label="View profile photo"></button>
         <div class="profile-name-block">
           <div class="profile-name" id="profileName">—</div>
           <div class="profile-sub" id="profileSub">OJT Intern</div>
@@ -716,6 +763,27 @@
 
       <div class="form-grid" style="grid-template-columns:1fr;gap:12px">
         <div class="form-group">
+          <label>Profile Avatar</label>
+          <div class="avatar-editor">
+            <div class="avatar-preview" id="profileAvatarPreview">
+              <div class="avatar-media" id="profileAvatarMedia">
+                <div class="avatar-placeholder" aria-label="No avatar selected">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor" d="M9 4.5c0-.83.67-1.5 1.5-1.5h3C14.33 3 15 3.67 15 4.5V6h1.2c.53 0 1.04.21 1.41.59l1.8 1.8c.38.37.59.88.59 1.41V18c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2V9.8c0-.53.21-1.04.59-1.41l1.8-1.8C6.76 6.21 7.27 6 7.8 6H9V4.5Zm3 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0-1.6a2.4 2.4 0 1 1 0-4.8 2.4 2.4 0 0 1 0 4.8Z"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <input type="file" id="avatarUpload" accept="image/*" style="display:none" />
+            <input type="checkbox" id="removeAvatar" style="display:none" />
+            <div class="avatar-actions">
+              <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('avatarUpload').click()">Choose Photo</button>
+              <button type="button" class="btn btn-edit-ghost btn-sm" onclick="clearAvatar()">Clear</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
           <label>Full Name</label>
           <input type="text" id="profileModalName" placeholder="Your name" maxlength="60" />
         </div>
@@ -756,6 +824,29 @@
       <div class="modal-actions">
         <button class="btn btn-ghost" onclick="closeModal('profileModal')">Cancel</button>
         <button class="btn btn-primary" style="background:var(--accent)" onclick="saveProfileModal()">Save Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       AVATAR PREVIEW MODAL
+  ══════════════════════════════════════ -->
+  <div class="modal-overlay" id="avatarPreviewModal">
+    <div class="modal" style="max-width:360px">
+      <h2>Profile Photo</h2>
+      <div style="display:flex;justify-content:center;margin:12px 0 8px">
+        <div style="width:220px;height:220px;border-radius:50%;overflow:hidden;border:3px solid var(--border);background:var(--surface-2);box-shadow:0 12px 30px rgba(0,0,0,.18)">
+          <img id="avatarPreviewImage" src="" alt="Profile photo" style="width:100%;height:100%;object-fit:cover;display:none" />
+          <div id="avatarPreviewFallback" class="avatar-placeholder" style="width:100%;height:100%;display:none;align-items:center;justify-content:center">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor" d="M9 4.5c0-.83.67-1.5 1.5-1.5h3C14.33 3 15 3.67 15 4.5V6h1.2c.53 0 1.04.21 1.41.59l1.8 1.8c.38.37.59.88.59 1.41V18c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2V9.8c0-.53.21-1.04.59-1.41l1.8-1.8C6.76 6.21 7.27 6 7.8 6H9V4.5Zm3 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0-1.6a2.4 2.4 0 1 1 0-4.8 2.4 2.4 0 0 1 0 4.8Z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('avatarPreviewModal')">Close</button>
+        <button class="btn btn-primary" style="background:var(--accent)" onclick="switchToProfileFromAvatar()">Edit Profile</button>
       </div>
     </div>
   </div>
@@ -1049,7 +1140,7 @@
     // ═══════════════════════════════════════════════
     // PROFILE helpers
     // ═══════════════════════════════════════════════
-    function loadProfile() {
+function loadProfile() {
       const raw = localStorage.getItem(KEY_PROFILE);
       if (!raw) return null;
       const p = JSON.parse(raw);
@@ -1057,13 +1148,18 @@
       const dg = parseFloat(p.dailyGoal);
       return {
         name: p.name || '',
+        avatarB64: p.avatarB64 && typeof p.avatarB64 === 'string' ? p.avatarB64 : null,
         hours: Math.max(1, parseInt(p.hours, 10) || 486),
         endDate: typeof p.endDate === 'string' ? p.endDate : '',
         breakHours: !isNaN(bh) && bh >= 0 && bh <= 12 ? bh : 1,
         dailyGoal: !isNaN(dg) && dg >= 0 && dg <= 24 ? dg : 6,
       };
     }
-    function saveProfileData(p) {
+function saveProfileData(p) {
+      // Ensure avatarB64 is valid data URL or null
+      if (p.avatarB64 && !p.avatarB64.startsWith('data:image/png;base64,')) {
+        p.avatarB64 = null;
+      }
       localStorage.setItem(KEY_PROFILE, JSON.stringify(p));
       markDataChanged();
     }
@@ -1312,6 +1408,81 @@
       return name.trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
     }
 
+    let currentProfile = null;
+
+    function avatarPlaceholderHtml() {
+      return `<div class="avatar-placeholder" aria-label="No avatar selected">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M9 4.5c0-.83.67-1.5 1.5-1.5h3C14.33 3 15 3.67 15 4.5V6h1.2c.53 0 1.04.21 1.41.59l1.8 1.8c.38.37.59.88.59 1.41V18c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2V9.8c0-.53.21-1.04.59-1.41l1.8-1.8C6.76 6.21 7.27 6 7.8 6H9V4.5Zm3 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0-1.6a2.4 2.4 0 1 1 0-4.8 2.4 2.4 0 0 1 0 4.8Z"/>
+        </svg>
+      </div>`;
+    }
+
+    function openAvatarPreview() {
+      const profile = loadProfile();
+      const imgEl = document.getElementById('avatarPreviewImage');
+      const fbEl = document.getElementById('avatarPreviewFallback');
+      if (!imgEl || !fbEl) return;
+
+      if (profile && profile.avatarB64) {
+        imgEl.src = profile.avatarB64;
+        imgEl.style.display = 'block';
+        fbEl.style.display = 'none';
+      } else {
+        imgEl.style.display = 'none';
+        fbEl.style.display = 'flex';
+      }
+      document.getElementById('avatarPreviewModal').classList.add('open');
+    }
+
+    function switchToProfileFromAvatar() {
+      closeModal('avatarPreviewModal');
+      // Small timeout to allow the class removal + transition,
+      // then open the profile modal on top.
+      setTimeout(openProfileModal, 150);
+    }
+
+    function updateProfileAvatar(avatarEl, profile) {
+      if (profile.avatarB64 && profile.avatarB64.startsWith('data:image/')) {
+        avatarEl.innerHTML = `<img src="${profile.avatarB64}" alt="${escapeHtml(profile.name || 'Profile')}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=\\'initials\\'>${initials(profile.name)}</div>'" />`;
+      } else {
+        avatarEl.innerHTML = `<div class="initials">${initials(profile.name)}</div>`;
+      }
+    }
+
+    window.clearAvatar = function() {
+      const media = document.getElementById('profileAvatarMedia');
+      if (media) media.innerHTML = avatarPlaceholderHtml();
+      document.getElementById('removeAvatar').checked = true;
+      currentProfile = currentProfile || {};
+      currentProfile.avatarB64 = null;
+    };
+
+    window.uploadAvatar = async function(file) {
+      if (!file || !file.type.startsWith('image/')) {
+        showToast('Please select an image file.', 'error');
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        showToast('Image too large (max 2MB).', 'error');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        // Keep the original image data (no downscaling/re-encoding),
+        // so the preview remains as close as possible to what was uploaded.
+        const b64 = e.target.result;
+        currentProfile = currentProfile || {};
+        currentProfile.avatarB64 = b64;
+
+        const media = document.getElementById('profileAvatarMedia');
+        if (media) media.innerHTML = `<img src="${b64}" alt="Preview" />`;
+        showToast('Avatar ready to save with profile!', 'success');
+      };
+      reader.readAsDataURL(file);
+    };
+
     /** Days between today (00:00) and a YYYY-MM-DD date string (inclusive of end day) */
     function daysUntil(dateStr) {
       const end = new Date(dateStr+'T00:00:00');
@@ -1380,18 +1551,34 @@
     // PROFILE MODAL (edit after setup)
     // ═══════════════════════════════════════════════
     function openProfileModal() {
-      const p = loadProfile();
-      if (!p) return;
-      document.getElementById('profileModalName').value = p.name;
-      document.getElementById('profileModalHours').value = p.hours;
-      document.getElementById('profileEndDate').value = p.endDate || '';
-      document.getElementById('profileBreakHours').value = p.breakHours;
-      document.getElementById('profileDailyGoal').value = p.dailyGoal != null ? p.dailyGoal : 6;
+      currentProfile = loadProfile();
+      if (!currentProfile) return;
+      document.getElementById('profileModalName').value = currentProfile.name;
+      document.getElementById('profileModalHours').value = currentProfile.hours;
+      document.getElementById('profileEndDate').value = currentProfile.endDate || '';
+      document.getElementById('profileBreakHours').value = currentProfile.breakHours;
+      document.getElementById('profileDailyGoal').value = currentProfile.dailyGoal != null ? currentProfile.dailyGoal : 6;
+      
+      const media = document.getElementById('profileAvatarMedia');
+      if (media) {
+        media.innerHTML = currentProfile.avatarB64
+          ? `<img src="${currentProfile.avatarB64}" alt="Preview" />`
+          : avatarPlaceholderHtml();
+      }
+      
+      document.getElementById('removeAvatar').checked = !currentProfile.avatarB64;
       document.getElementById('profileModalError').classList.remove('visible');
       initThemeControls();
       syncThemePickerUI(getStoredAccent());
       document.getElementById('profileModal').classList.add('open');
     }
+
+    // Avatar upload event listener
+    document.addEventListener('change', function(e) {
+      if (e.target.id === 'avatarUpload') {
+        uploadAvatar(e.target.files[0]);
+      }
+    });
 
     function saveProfileModal() {
       const name = document.getElementById('profileModalName').value.trim();
@@ -1403,17 +1590,19 @@
       const br = parseFloat(document.getElementById('profileBreakHours').value);
       const dg = parseFloat(document.getElementById('profileDailyGoal').value);
       const prev = loadProfile() || {};
-      saveProfileData({
+      const newProfile = {
         ...prev,
         name,
+        avatarB64: currentProfile ? currentProfile.avatarB64 : null,
         hours,
         endDate: endDate || '',
         breakHours: !isNaN(br) && br >= 0 && br <= 12 ? br : 1,
         dailyGoal: !isNaN(dg) && dg >= 0 && dg <= 24 ? dg : 6,
-      });
+      };
+      saveProfileData(newProfile);
       closeModal('profileModal');
       render();
-      showToast('Profile updated ✅', 'success');
+      showToast('Profile updated with avatar! ✅', 'success');
     }
 
     function resetAllData() {
@@ -1681,7 +1870,7 @@
 
       if (profile) {
         document.getElementById('profileName').textContent = profile.name;
-        document.getElementById('profileAvatar').textContent = initials(profile.name);
+        updateProfileAvatar(document.getElementById('profileAvatar'), profile);
         document.getElementById('requiredHoursDisplay').textContent = profile.hours;
         document.getElementById('headerSub').textContent = `${profile.name}'s OJT progress`;
 

@@ -1382,7 +1382,7 @@
     }
 
     button.otl-cal-cell {
-      min-height: 48px;
+      height: 64px;
       border-radius: var(--radius-sm);
       border: 1.5px solid var(--border);
       background: var(--surface-2);
@@ -1390,19 +1390,20 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      padding: 4px 2px 6px;
+      padding: 6px 4px;
       font-size: 11px;
       color: var(--text-muted);
       transition: var(--tr);
       width: 100%;
       font-family: inherit;
-      -webkit-tap-highlight-color: transparent
+      -webkit-tap-highlight-color: transparent;
+      overflow: hidden;
     }
 
     .otl-cal-cell.pad {
       background: transparent;
       border-color: transparent;
-      min-height: 8px;
+      height: 64px;
       pointer-events: none
     }
 
@@ -1460,12 +1461,24 @@
       font-size: 8px;
       color: var(--danger);
       font-weight: 700;
-      margin-top: 1px;
+      margin-top: 2px;
       display: block;
       width: 100%;
       white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis
+      position: relative;
+    }
+
+    .otl-cal-hol span {
+      display: inline-block;
+      min-width: 100%;
+      animation: calMarquee 6s linear infinite;
+      padding-left: 20%;
+    }
+
+    @keyframes calMarquee {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
     }
 
     .otl-cal-legend {
@@ -2512,6 +2525,26 @@
       </div>
     </div>
 
+    <!-- ══════════════════════════════════════
+       RESET CONFIRMATION MODAL
+  ══════════════════════════════════════ -->
+    <div class="modal-overlay" id="resetConfirmModal">
+      <div class="modal" style="max-width:380px">
+        <h2 style="color:var(--danger)">🗑 Reset All Data?</h2>
+        <p class="modal-desc">This will permanently delete ALL entries and your profile. This action cannot be undone.</p>
+        <p style="font-size: 13px; margin-bottom: 12px;">Type <strong style="color:var(--danger)">RESET</strong> below to confirm:</p>
+        <input type="text" id="resetConfirmInput" placeholder="Type RESET" autocomplete="off"
+               style="width:100%; padding:12px; border-radius:var(--radius-sm); border:1.5px solid var(--border); font-family:var(--font-body); font-weight:600; text-align:center; outline:none; transition:var(--tr); background:var(--surface-2)"
+               oninput="validateResetInput()" />
+        <div class="modal-actions">
+          <button class="btn btn-ghost" onclick="closeModal('resetConfirmModal')">Cancel</button>
+          <button class="btn btn-primary" id="confirmResetBtn" disabled 
+                  style="background:var(--danger); border-color:var(--danger); opacity:0.5; cursor:not-allowed;" 
+                  onclick="executeReset()">Yes, Reset Everything</button>
+        </div>
+      </div>
+    </div>
+
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
@@ -3276,7 +3309,29 @@
       }
 
       function resetAllData() {
-        if (!confirm('This will delete ALL entries and your profile. Are you sure?')) return;
+        document.getElementById('resetConfirmInput').value = '';
+        validateResetInput();
+        document.getElementById('resetConfirmModal').classList.add('open');
+      }
+
+      function validateResetInput() {
+        const input = document.getElementById('resetConfirmInput').value.trim();
+        const btn = document.getElementById('confirmResetBtn');
+        if (input === 'RESET') {
+          btn.disabled = false;
+          btn.style.opacity = '1';
+          btn.style.cursor = 'pointer';
+        } else {
+          btn.disabled = true;
+          btn.style.opacity = '0.5';
+          btn.style.cursor = 'not-allowed';
+        }
+      }
+
+      function executeReset() {
+        const input = document.getElementById('resetConfirmInput').value.trim();
+        if (input !== 'RESET') return;
+
         localStorage.removeItem(KEY_ENTRIES);
         localStorage.removeItem(KEY_PROFILE);
         localStorage.removeItem(KEY_ACCENT);
@@ -3285,8 +3340,10 @@
         localStorage.removeItem(KEY_INSTALL_TIP);
         sessionStorage.removeItem('ojt_backup_remind_dismissed');
         persistAccent(DEFAULT_ACCENT);
+        closeModal('resetConfirmModal');
         closeModal('profileModal');
         showSetup();
+        showToast('All data has been wiped. 🗑️', 'success');
       }
 
       let otlCalYear = null;
@@ -3460,7 +3517,7 @@
           if (roll && roll.rest) cls += ' has-rest';
           if (isToday) cls += ' today';
           let inner = '<span class="otl-cal-daynum">' + day + '</span>';
-          if (holName) inner += '<span class="otl-cal-hol" title="' + holName + '">' + holName + '</span>';
+          if (holName) inner += '<span class="otl-cal-hol" title="' + holName + '"><span>' + holName + '</span></span>';
           if (roll && roll.hrs > 0) inner += '<span class="otl-cal-hrs">' + roll.hrs.toFixed(1) + 'h</span>';
           if (roll && roll.rest) inner += '<span class="otl-cal-rest">Rest</span>';
           html +=
@@ -3648,7 +3705,7 @@
               }
             } else {
               dateEl.textContent = fmtDate(strExactEnd);
-              document.getElementById('deadlineDateSub').textContent = 'fixed schedule';
+              document.getElementById('deadlineDateSub').textContent = 'estimated schedule';
             }
             dlCard.classList.remove('urgent', 'done-item');
             if (daysNeeded <= 7) dlCard.classList.add('urgent');
@@ -3922,6 +3979,7 @@
       document.getElementById('themeStyleModal').addEventListener('click', function (e) { if (e.target === this) closeModal('themeStyleModal'); });
       document.getElementById('calendarDayModal').addEventListener('click', function (e) { if (e.target === this) closeModal('calendarDayModal'); });
       document.getElementById('qrModal').addEventListener('click', function (e) { if (e.target === this) closeModal('qrModal'); });
+      document.getElementById('resetConfirmModal').addEventListener('click', function (e) { if (e.target === this) closeModal('resetConfirmModal'); });
 
       document.getElementById('otlCalPrev').addEventListener('click', function () {
         ensureOtlCalMonth();

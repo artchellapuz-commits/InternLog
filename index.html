@@ -684,8 +684,6 @@
       </div>
       <p class="error-msg" id="formError">⚠ Time Out must be after Time In.</p>
       <button class="btn btn-primary" onclick="addEntry()">＋ &nbsp;Log Hours</button>
-    </div>
-
     <!-- LOG TABLE -->
     <div class="section-title" style="margin-bottom:8px">Log</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
@@ -696,8 +694,15 @@
     </div>
     <div class="card" style="padding:0;overflow:visible">
       <div class="toolbar">
-        <div class="toolbar-left">
-          <input type="text" class="search-input" id="logSearch" placeholder="Search by date or notes..." oninput="render()" />
+        <div class="toolbar-left" style="gap:8px;">
+          <select id="logShowEntries" class="form-control" style="width: auto; padding: 6px 10px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); background: var(--surface-2); color: var(--text); font-size: 13px; outline: none; transition: var(--tr);" onchange="logCurrentPage=1; render()">
+            <option value="10">Show 10</option>
+            <option value="25">Show 25</option>
+            <option value="50">Show 50</option>
+            <option value="100">Show 100</option>
+            <option value="all" selected>All entries</option>
+          </select>
+          <input type="text" class="search-input" id="logSearch" placeholder="Search by date or notes..." oninput="logCurrentPage=1; render()" />
         </div>
         <div class="toolbar-right">
           <button type="button" class="btn btn-ghost" onclick="printDTRReport()" title="Print or save as PDF">🖨 Print</button>
@@ -1342,12 +1347,69 @@ function saveProfileData(p) {
     }
 
     let logFilter = 'all';
+    let logCurrentPage = 1;
+
     function setLogFilter(val) {
       logFilter = val;
+      logCurrentPage = 1;
       document.querySelectorAll('[data-log-filter]').forEach(b => {
         b.classList.toggle('active', b.dataset.logFilter === val);
       });
       render();
+    }
+
+    function logChangePage(type, val) {
+      if (type === 'first') logCurrentPage = 1;
+      else if (type === 'last') logCurrentPage = val;
+      else if (type === 'prev') logCurrentPage = Math.max(1, logCurrentPage - 1);
+      else if (type === 'next') logCurrentPage = Math.min(val, logCurrentPage + 1);
+      else if (type === 'exact') logCurrentPage = val;
+      render();
+    }
+
+    function buildPagination(totalPages) {
+      if (totalPages <= 1) return '';
+      let html = '<div style="display:flex; justify-content:center; align-items:center; gap:8px; margin-top:20px; font-size:14px; color:var(--text-muted); font-weight:500;">';
+      const btnStyle = "padding:6px 10px; border-radius:100px; cursor:pointer; min-width:32px; text-align:center; transition:var(--tr); border:none; background:transparent; color:inherit; font-family:var(--font-heading)";
+      const activeStyle = "background:rgba(var(--accent-rgb), 0.15); color:var(--accent-dark); font-weight:700;";
+      const disabledStyle = "opacity:0.3; cursor:default";
+      const hoverAttr = "onmouseover=\"this.style.background='rgba(0,0,0,0.05)'\" onmouseout=\"this.style.background='transparent'\"";
+
+      // << and <
+      if (logCurrentPage > 1) {
+        html += `<button type="button" style="${btnStyle}" ${hoverAttr} onclick="logChangePage('first')">&laquo;</button>`;
+        html += `<button type="button" style="${btnStyle}" ${hoverAttr} onclick="logChangePage('prev')">&lsaquo;</button>`;
+      } else {
+        html += `<button type="button" style="${btnStyle} ${disabledStyle}" disabled>&laquo;</button>`;
+        html += `<button type="button" style="${btnStyle} ${disabledStyle}" disabled>&lsaquo;</button>`;
+      }
+
+      // Pages
+      for (let i = 1; i <= totalPages; i++) {
+        if (totalPages > 7) {
+          if (i !== 1 && i !== totalPages && Math.abs(logCurrentPage - i) > 1) {
+            if (i === 2 || i === totalPages - 1) html += '<span style="color:var(--border)">...</span>';
+            continue;
+          }
+        }
+        if (i === logCurrentPage) {
+          html += `<div style="${btnStyle} ${activeStyle}">${i}</div>`;
+        } else {
+          html += `<button type="button" style="${btnStyle}" ${hoverAttr} onclick="logChangePage('exact', ${i})">${i}</button>`;
+        }
+      }
+
+      // > and >>
+      if (logCurrentPage < totalPages) {
+        html += `<button type="button" style="${btnStyle}" ${hoverAttr} onclick="logChangePage('next', ${totalPages})">&rsaquo;</button>`;
+        html += `<button type="button" style="${btnStyle}" ${hoverAttr} onclick="logChangePage('last', ${totalPages})">&raquo;</button>`;
+      } else {
+        html += `<button type="button" style="${btnStyle} ${disabledStyle}" disabled>&rsaquo;</button>`;
+        html += `<button type="button" style="${btnStyle} ${disabledStyle}" disabled>&raquo;</button>`;
+      }
+
+      html += '</div>';
+      return html;
     }
 
     function syncRestDayForm() {
@@ -1450,7 +1512,7 @@ function saveProfileData(p) {
 
     function updateProfileAvatar(avatarEl, profile) {
       if (profile.avatarB64 && profile.avatarB64.startsWith('data:image/')) {
-        avatarEl.innerHTML = `<img src="${profile.avatarB64}" alt="${escapeHtml(profile.name || 'Profile')}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=\\'initials\\'>${initials(profile.name)}</div>'" />`;
+        avatarEl.innerHTML = `<img src="${profile.avatarB64}" alt="${escapeHtml(profile.name || 'Profile')}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=\'initials\'>${initials(profile.name)}</div>'" />`;
       } else {
         avatarEl.innerHTML = `<div class="initials">${initials(profile.name)}</div>`;
       }
@@ -2012,7 +2074,27 @@ function saveProfileData(p) {
         }
       }
 
-      renderTable(displayEntries);
+      let limit = 'all';
+      const showSel = document.getElementById('logShowEntries');
+      if (showSel) limit = showSel.value;
+      
+      const reversedEntries = [...displayEntries].reverse();
+      let finalEntries = reversedEntries;
+      let totalPages = 1;
+
+      if (limit !== 'all') {
+        const numLimit = parseInt(limit, 10);
+        if (!isNaN(numLimit) && numLimit > 0) {
+          totalPages = Math.ceil(reversedEntries.length / numLimit) || 1;
+          if (logCurrentPage > totalPages) logCurrentPage = totalPages;
+          if (logCurrentPage < 1) logCurrentPage = 1;
+          
+          const startIdx = (logCurrentPage - 1) * numLimit;
+          finalEntries = reversedEntries.slice(startIdx, startIdx + numLimit);
+        }
+      }
+
+      renderTable(finalEntries, totalPages);
       renderOtlCalendar();
       maybeShowInstallTip();
       updateBackupReminderUI();
@@ -2068,7 +2150,7 @@ function saveProfileData(p) {
       alertEl.style.display = 'flex';
     }
 
-    function renderTable(entries) {
+    function renderTable(entries, totalPages = 1) {
       const area = document.getElementById('tableArea');
       if (!entries.length) {
         area.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>No entries yet. Log your first day above!</p></div>`;
@@ -2079,7 +2161,7 @@ function saveProfileData(p) {
       const idToIndex = {};
       allEntries.forEach((ae, i) => { idToIndex[ae.id] = i; });
 
-      const rows = [...entries].reverse().map(e => {
+      const rows = entries.map(e => {
         const idx = e.id != null && idToIndex[e.id] != null ? idToIndex[e.id] : allEntries.findIndex(ae => ae.id === e.id);
         const rest = !!e.isRest;
         const tin = rest ? '—' : fmtTime(e.timeIn);
@@ -2106,7 +2188,8 @@ function saveProfileData(p) {
       area.innerHTML = `<div class="table-wrapper"><table>
         <thead><tr><th>Date</th><th>Time In</th><th>Time Out</th><th>Hours</th><th>Notes</th><th style="text-align:right">Actions</th></tr></thead>
         <tbody>${rows}</tbody>
-      </table></div>`;
+      </table></div>
+      ${buildPagination(totalPages)}`;
     }
 
     // ═══════════════════════════════════════════════

@@ -322,8 +322,10 @@
     .otl-cal-cell.has-rest{border-style:dashed;border-color:var(--blue)}
     .otl-cal-cell.today{box-shadow:0 0 0 2px var(--accent)}
     .otl-cal-daynum{font-family:var(--font-display);font-size:13px;font-weight:800;line-height:1.1}
+    .otl-cal-cell.is-holiday .otl-cal-daynum{color:var(--danger)}
     .otl-cal-hrs{font-size:10px;font-weight:600;color:var(--accent-dark);margin-top:2px}
     .otl-cal-rest{font-size:9px;color:var(--blue);font-weight:600;margin-top:1px}
+    .otl-cal-hol{font-size:8px;color:var(--danger);font-weight:700;margin-top:1px;display:block;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .otl-cal-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;font-size:11px;color:var(--text-muted)}
     .otl-cal-legend span{display:inline-flex;align-items:center;gap:6px}
     .otl-cal-legend i{width:12px;height:12px;border-radius:3px;background:var(--accent-light);border:1.5px solid var(--accent)}
@@ -622,8 +624,8 @@
       </div>
       <div id="otlCalBody">
         <div class="otl-cal-dows" aria-hidden="true">
-          <div class="otl-cal-dow">Mon</div><div class="otl-cal-dow">Tue</div><div class="otl-cal-dow">Wed</div><div class="otl-cal-dow">Thu</div>
-          <div class="otl-cal-dow">Fri</div><div class="otl-cal-dow">Sat</div><div class="otl-cal-dow">Sun</div>
+          <div class="otl-cal-dow" style="color:var(--danger)">Sun</div><div class="otl-cal-dow">Mon</div><div class="otl-cal-dow">Tue</div><div class="otl-cal-dow">Wed</div>
+          <div class="otl-cal-dow">Thu</div><div class="otl-cal-dow">Fri</div><div class="otl-cal-dow" style="color:var(--danger)">Sat</div>
         </div>
         <div class="otl-cal-grid" id="otlCalGrid" role="grid" aria-label="Hours by day"></div>
         <div class="otl-cal-legend">
@@ -1638,9 +1640,8 @@ function saveProfileData(p) {
       return y + '-' + String(monthIndex + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
     }
 
-    function mondayPadFirstOfMonth(y, m) {
-      const wd = new Date(y, m, 1).getDay();
-      return wd === 0 ? 6 : wd - 1;
+    function sundayPadFirstOfMonth(y, m) {
+      return new Date(y, m, 1).getDay();
     }
 
     function rollupByDate(entries) {
@@ -1704,6 +1705,53 @@ function saveProfileData(p) {
       document.getElementById('calendarDayModal').classList.add('open');
     }
 
+    function getHolidayName(dateObj) {
+      const m = dateObj.getMonth() + 1;
+      const d = dateObj.getDate();
+      const y = dateObj.getFullYear();
+      const md = (m < 10 ? '0' : '') + m + '-' + (d < 10 ? '0' : '') + d;
+      const fixedHolidays = {
+        '01-01': 'New Year\'s Day',
+        '04-09': 'Araw ng Kagitingan',
+        '05-01': 'Labor Day',
+        '06-12': 'Independence Day',
+        '08-21': 'Ninoy Aquino Day',
+        '11-01': 'All Saints\' Day',
+        '11-30': 'Bonifacio Day',
+        '12-08': 'Immaculate Conception',
+        '12-25': 'Christmas Day',
+        '12-30': 'Rizal Day',
+        '12-31': 'Last Day of Year'
+      };
+      if (fixedHolidays[md]) return fixedHolidays[md];
+      if (y === 2024 && md === '03-28') return 'Maundy Thursday';
+      if (y === 2024 && md === '03-29') return 'Good Friday';
+      if (y === 2025 && md === '04-17') return 'Maundy Thursday';
+      if (y === 2025 && md === '04-18') return 'Good Friday';
+      if (y === 2026 && md === '04-02') return 'Maundy Thursday';
+      if (y === 2026 && md === '04-03') return 'Good Friday';
+      if (y === 2027 && md === '03-25') return 'Maundy Thursday';
+      if (y === 2027 && md === '03-26') return 'Good Friday';
+      if (m === 8 && dateObj.getDay() === 1 && d >= 25) return 'National Heroes Day';
+      return null;
+    }
+
+    function isHoliday(dateObj) {
+      return getHolidayName(dateObj) !== null;
+    }
+
+    function addWorkingDays(startDate, daysToAdd) {
+      let currentDate = new Date(startDate);
+      while (daysToAdd > 0) {
+        currentDate.setDate(currentDate.getDate() + 1);
+        const dayOfWeek = currentDate.getDay();
+        if (dayOfWeek !== 0 && dayOfWeek !== 6 && !isHoliday(currentDate)) {
+          daysToAdd--;
+        }
+      }
+      return currentDate;
+    }
+
     function renderOtlCalendar() {
       ensureOtlCalMonth();
       const y = otlCalYear;
@@ -1712,7 +1760,7 @@ function saveProfileData(p) {
       const rollup = rollupByDate(entries);
       const last = new Date(y, m + 1, 0);
       const daysInMonth = last.getDate();
-      const pad = mondayPadFirstOfMonth(y, m);
+      const pad = sundayPadFirstOfMonth(y, m);
 
       const titleEl = document.getElementById('otlCalMonthTitle');
       const statEl = document.getElementById('otlCalMonthStat');
@@ -1739,11 +1787,16 @@ function saveProfileData(p) {
         const dateStr = padYmdParts(y, m, day);
         const roll = rollup[dateStr];
         const isToday = dateStr === todayStr;
+        const dObj = new Date(y, m, day);
+        const holName = getHolidayName(dObj);
+        const isWeekendOrHol = dObj.getDay() === 0 || dObj.getDay() === 6 || !!holName;
         let cls = 'otl-cal-cell';
+        if (isWeekendOrHol) cls += ' is-holiday';
         if (roll && roll.hrs > 0) cls += ' has-work';
         if (roll && roll.rest) cls += ' has-rest';
         if (isToday) cls += ' today';
         let inner = '<span class="otl-cal-daynum">' + day + '</span>';
+        if (holName) inner += '<span class="otl-cal-hol" title="' + holName + '">' + holName + '</span>';
         if (roll && roll.hrs > 0) inner += '<span class="otl-cal-hrs">' + roll.hrs.toFixed(1) + 'h</span>';
         if (roll && roll.rest) inner += '<span class="otl-cal-rest">Rest</span>';
         html +=
@@ -1894,8 +1947,31 @@ function saveProfileData(p) {
           document.getElementById('profileSub').textContent = 'OJT Hours Completed!';
           document.getElementById('paceAlert').style.display = 'none';
         } else if (workList.length >= 1) {
-          const avgPerDay = total / workList.length;
-          const daysNeeded = Math.max(1, Math.ceil(remaining / Math.max(avgPerDay, 0.01)));
+          const pacePerDay = profile.dailyGoal > 0 ? profile.dailyGoal : 6;
+          const totalDaysRequired = Math.ceil(profile.hours / pacePerDay);
+          const tNow = new Date();
+          const todayLocalStr = tNow.getFullYear() + '-' + String(tNow.getMonth()+1).padStart(2, '0') + '-' + String(tNow.getDate()).padStart(2, '0');
+          
+          let startDateStr = todayLocalStr;
+          if (workList.length > 0) {
+            const sortedDates = workList.map(e => e.date).sort();
+            startDateStr = sortedDates[0];
+          }
+          
+          let absences = 0;
+          for (const w of workList) {
+            if (w.isRest || w.hours === 0) {
+              const dObj = new Date(w.date);
+              const dayOfWeek = dObj.getDay();
+              if (dayOfWeek !== 0 && dayOfWeek !== 6 && !isHoliday(dObj)) {
+                absences++;
+              }
+            }
+          }
+          
+          const daysNeeded = Math.max(1, Math.ceil(remaining / pacePerDay));
+          const tempEndDate = addWorkingDays(new Date(startDateStr), totalDaysRequired - 1 + absences);
+          const strExactEnd = tempEndDate.getFullYear() + '-' + String(tempEndDate.getMonth()+1).padStart(2, '0') + '-' + String(tempEndDate.getDate()).padStart(2, '0');
           dlEl.textContent = daysNeeded;
           if (profile.endDate && calendarDaysLeft != null) {
             const fd = fmtDate(profile.endDate);
@@ -1907,8 +1983,8 @@ function saveProfileData(p) {
               document.getElementById('deadlineDateSub').textContent = calendarDaysLeft + ' cal. days';
             }
           } else {
-            dateEl.textContent = `in ${daysNeeded} day${daysNeeded === 1 ? '' : 's'}`;
-            document.getElementById('deadlineDateSub').textContent = 'at current pace';
+            dateEl.textContent = fmtDate(strExactEnd);
+            document.getElementById('deadlineDateSub').textContent = 'fixed schedule';
           }
           dlCard.classList.remove('urgent', 'done-item');
           if (daysNeeded <= 7) dlCard.classList.add('urgent');
@@ -1918,7 +1994,7 @@ function saveProfileData(p) {
             document.getElementById('profileSub').textContent =
               profile.endDate && calendarDaysLeft != null && calendarDaysLeft >= 0
                 ? `${calendarDaysLeft} calendar day${calendarDaysLeft === 1 ? '' : 's'} until target`
-                : `Est. finish in ${daysNeeded} day${daysNeeded === 1 ? '' : 's'}`;
+                : `Exact End: ${fmtDate(strExactEnd)}`;
           }
           if (workList.length >= 2) renderPaceAlert(total, remaining, daysNeeded, required, calendarDaysLeft);
           else document.getElementById('paceAlert').style.display = 'none';

@@ -1,4 +1,4 @@
-# InternLog Avatar Feature - Implementation Steps
+![fix the design](image.png)# InternLog Avatar Feature - Implementation Steps
 
 ## ✅ 1. Add CSS for image avatar support
 - Update .profile-avatar styles for img child
